@@ -26,10 +26,12 @@
     "path": "^0.12.7",
     "prettier": "^3.2.4",
     "tiny-glob": "^0.2.9",
+    "@types/vimeo__player": "^2.18.3",
     "typescript": "^5.3.3"
   },
   "dependencies": {
     "@finsweet/ts-utils": "^0.40.0",
+    "@vimeo/player": "^2.24.0",
     "gsap": "^3.12.5"
   }
 }
