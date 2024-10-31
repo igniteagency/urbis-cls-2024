@@ -32,6 +32,7 @@
   "dependencies": {
     "@finsweet/ts-utils": "^0.40.0",
     "@vimeo/player": "^2.24.0",
-    "gsap": "^3.12.5"
+    "gsap": "^3.12.5",
+    "split-type": "^0.3.4"
   }
 }
