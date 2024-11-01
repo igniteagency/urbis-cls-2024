@@ -67,7 +67,7 @@ export function IntroAnimation() {
       clipPath: 'inset(0 0 100% 0)',
       duration: 1,
     },
-    '-=0.5'
+    '-=1.5'
   );
 
   introTl.from(
@@ -129,12 +129,39 @@ export function IntroAnimation() {
           duration: 1,
           ease: 'power4.in',
           stagger: 0.2,
-          delay: 1.5, // Wait 2 seconds before starting the exit animation
+          delay: 1.5, // Wait before starting the exit animation
         },
         '-=0.5'
       );
     }
+
+    // Add a dummy, zero-duration tween to mark the end of this sequence
+    introTl.to({}, { duration: 0 });
   });
+
+  introTl.to(
+    '.intro_logo',
+    {
+      yPercent: 140,
+    },
+    '-=1'
+  );
+
+  introTl.to(
+    '.menu_wrapper',
+    {
+      y: 0,
+    },
+    '<+=0.2'
+  );
+
+  introTl.to(
+    '.header-scroll-ind',
+    {
+      y: 0,
+    },
+    '<+=0.2'
+  );
 
   //introTl.play('logoExit');
 }
