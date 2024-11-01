@@ -13,9 +13,24 @@ export function IntroAnimation() {
     },
   });
 
-  const splitText = new window.SplitType('.intro_message-wrap p', {
-    types: 'chars', // Splits into characters; options include 'words' or 'lines'
-    tagName: 'span', // Wrap each character in a span for easier styling
+  const introMessages = document.querySelectorAll('.intro_message p');
+  introMessages.forEach((message) => {
+    const splitText = new window.SplitType(message, {
+      types: 'lines',
+      tagName: 'span',
+    });
+
+    splitText.lines.forEach((line) => {
+      const wrapper = document.createElement('div');
+      wrapper.style.overflow = 'hidden';
+      wrapper.style.display = 'inline-block'; // Keeps lines in place horizontally
+
+      line.parentNode.insertBefore(wrapper, line);
+      wrapper.appendChild(line);
+    });
+
+    // Set each line to start at yPercent -100 (above)
+    gsap.set(message.querySelectorAll('.line'), { yPercent: 100 });
   });
 
   window.gsap.set('.hero-header_background-video-wrapper', {
@@ -52,36 +67,39 @@ export function IntroAnimation() {
       clipPath: 'inset(0 0 100% 0)',
       duration: 1,
     },
-    '+=0.2'
+    '-=0.5'
   );
 
   introTl.from(
     '.heading_cl > *',
     {
       yPercent: 100,
-      duration: 0.5,
-      stagger: 0.2,
-    },
-    '>'
-  );
-
-  introTl.from(
-    '.heading_2024 > span',
-    {
-      opacity: 0,
+      ease: 'power4.out',
       duration: 1,
       stagger: 0.2,
     },
     '>'
   );
 
+  introTl.from(
+    '.heading_2024 > span', //2024 number
+    {
+      opacity: 0,
+      duration: 1,
+      stagger: 0.2,
+    },
+    '-=1'
+  );
+
   introTl.to(
     '.intro_logo-wrap',
     {
-      y: 'calc(50vh - 100%)',
+      y: 0,
       scale: 1,
+      duration: 2,
     },
-    'logoExit'
+    //'logoExit'
+    '>'
   );
 
   introTl.to(
@@ -90,8 +108,33 @@ export function IntroAnimation() {
       clipPath: 'inset(0%)',
       duration: 2,
     },
-    '>'
+    '<'
   );
 
-  introTl.play('logoExit');
+  introMessages.forEach((message, index) => {
+    // Animate lines in for each .intro_message
+    introTl.to(message.querySelectorAll('.line'), {
+      yPercent: 0, // Animate line to visible position
+      duration: 1,
+      ease: 'power4.out',
+      stagger: 0.2, // Stagger between lines within the message
+    });
+
+    // Only add the exit animation if it's not the last message
+    if (index < introMessages.length - 1) {
+      introTl.to(
+        message.querySelectorAll('.line'),
+        {
+          yPercent: -100, // Animate line downward to hide
+          duration: 1,
+          ease: 'power4.in',
+          stagger: 0.2,
+          delay: 1.5, // Wait 2 seconds before starting the exit animation
+        },
+        '-=0.5'
+      );
+    }
+  });
+
+  //introTl.play('logoExit');
 }
