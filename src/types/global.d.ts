@@ -17,6 +17,7 @@ declare global {
 
     gsap: GSAP;
     ScrollTrigger: typeof ScrollTrigger;
+    SplitType: typeof SplitType;
 
     loadExternalScript(url: string, placement: 'head' | 'body', defer: boolean): void;
   }
