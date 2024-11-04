@@ -67,7 +67,7 @@ export function IntroAnimation() {
       clipPath: 'inset(0 0 100% 0)',
       duration: 1,
     },
-    '-=1.5'
+    '-=1'
   );
 
   introTl.from(
