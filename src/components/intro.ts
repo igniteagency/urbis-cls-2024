@@ -142,7 +142,7 @@ export function IntroAnimation() {
   introTl.to(
     '.intro_logo',
     {
-      yPercent: 140,
+      yPercent: 122,
     },
     '-=1'
   );
