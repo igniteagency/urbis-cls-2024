@@ -1,4 +1,4 @@
-import type Chart from 'chart.js/auto';
+import Chart from 'chart.js/auto';
 import type { ChartDataset, ScriptableContext } from 'chart.js/auto';
 
 import BarChart from '$charts/bar';

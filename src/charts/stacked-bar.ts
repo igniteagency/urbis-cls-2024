@@ -1,11 +1,11 @@
-import type Chart from 'chart.js/auto';
+import Chart from 'chart.js/auto';
 import type { ChartDataset, ChartTypeRegistry, TooltipItem } from 'chart.js/auto';
 import type { Context } from 'chartjs-plugin-datalabels';
 
 import { lighten } from '$utils/colorLighten';
-import UrbisSurveyChart, { type legendAlignment, type legendPosition } from '$charts/main';
+import UrbisSurveyChart, { type legendAlignment, type legendPosition } from '$charts/class/urbis-survey-chart';
 
-class VerticalDeviationChart extends UrbisSurveyChart {
+class StackedBarChart extends UrbisSurveyChart {
   /**
    * Title of the chart; if defined
    */
@@ -350,4 +350,4 @@ class VerticalDeviationChart extends UrbisSurveyChart {
   }
 }
 
-export default VerticalDeviationChart;
+export default StackedBarChart;

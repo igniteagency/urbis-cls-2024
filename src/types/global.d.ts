@@ -19,7 +19,7 @@ declare global {
     ScrollTrigger: typeof ScrollTrigger;
     SplitType: typeof SplitType;
 
-    loadExternalScript(url: string, placement: 'head' | 'body', defer: boolean): void;
+    loadExternalScript(url: string, placement: 'head' | 'body' = 'body', defer: boolean = true): void;
   }
 
   // Extend `querySelector` and `querySelectorAll` function to stop the nagging of converting `Element` to `HTMLElement` all the time

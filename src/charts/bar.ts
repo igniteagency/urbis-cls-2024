@@ -1,8 +1,8 @@
-import type Chart from 'chart.js/auto';
+import Chart from 'chart.js/auto';
 import type { ChartDataset, CoreScaleOptions, Scale } from 'chart.js/auto';
 
 import { lighten } from '$utils/colorLighten';
-import UrbisSurveyChart, { type legendPosition, type legendAlignment } from '$charts/main';
+import UrbisSurveyChart, { type legendPosition, type legendAlignment } from '$charts/class/urbis-survey-chart';
 
 class BarChart extends UrbisSurveyChart {
   /**
@@ -86,8 +86,8 @@ class BarChart extends UrbisSurveyChart {
               },
             },
             grid: {
-              // display: false,
-              drawBorder: false,
+              display: false,
+              // drawBorder: false,
               drawTicks: true,
             },
             min: 0,
@@ -191,6 +191,7 @@ class BarChart extends UrbisSurveyChart {
         backgroundColor: this.getBackgroundColor(i),
         barThickness: 'flex',
         barPercentage: 1,
+        borderWidth: 0,
       });
     }
 

@@ -2,6 +2,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SplitType from 'split-type';
 
+import ChartJSInit from '$charts/main';
+
 import { IntroAnimation } from './components/intro';
 import TableChart from './components/table-data';
 import VimeoVideoControls from './components/vimeo-video-player';
@@ -13,6 +15,9 @@ window.SplitType = SplitType;
 
 window.Webflow?.push(() => {
   new VimeoVideoControls();
+
   new TableChart();
+  new ChartJSInit();
+
   IntroAnimation();
 });
