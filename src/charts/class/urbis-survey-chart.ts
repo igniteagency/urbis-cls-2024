@@ -111,7 +111,9 @@ abstract class UrbisSurveyChart {
             );
           }
 
-          this.chartLabels = this.extractDataAsString(this.chartLabelsList[toggleIndex]);
+          if (this.chartLabelsList[toggleIndex]) {
+            this.chartLabels = this.extractDataAsString(this.chartLabelsList[toggleIndex]);
+          }
 
           try {
             // init child class toggleChartData function
