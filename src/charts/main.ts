@@ -109,7 +109,7 @@ class ChartJSInit {
           new HorizontalDeviationChart(chart).init();
           break;
 
-        case 'stacked-bar':
+        case 'vertical-stacked-bar':
           new StackedBarChart(chart).init();
           break;
 
