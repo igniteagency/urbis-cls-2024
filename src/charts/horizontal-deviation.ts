@@ -45,7 +45,8 @@ class HorizontalDeviationChart extends BarChart {
               },
             },
             grid: {
-              drawBorder: false,
+              display: false,
+              // drawBorder: false,
               drawTicks: true,
             },
           },

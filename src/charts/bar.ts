@@ -178,6 +178,7 @@ class BarChart extends UrbisSurveyChart {
 
     this.populateChartValuesList();
     this.chartInstance.config.data.datasets = this.generateDataset();
+    this.chartInstance.config.data.labels = this.chartLabels;
     this.chartInstance.update();
   }
 
