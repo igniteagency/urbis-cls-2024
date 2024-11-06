@@ -101,7 +101,7 @@ class ChartJSInit {
       const chartType = chart.getAttribute('data-chart-type');
 
       switch (chartType) {
-        case 'bar':
+        case 'horizontal-bar':
           new BarChart(chart).init();
           break;
 
