@@ -130,7 +130,7 @@ class StackedBarChart extends UrbisSurveyChart {
             },
             grid: {
               display: false,
-              drawBorder: false, // no vertical border of the axis
+              // drawBorder: false, // no vertical border of the axis
             },
           },
         },
@@ -229,6 +229,7 @@ class StackedBarChart extends UrbisSurveyChart {
 
     this.populateChartValuesList();
     this.chartInstance.config.data.datasets = this.generateDataset();
+    this.chartInstance.config.data.labels = this.chartLabels;
     this.chartInstance.update();
   }
 

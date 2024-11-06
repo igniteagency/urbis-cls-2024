@@ -43,6 +43,7 @@ abstract class UrbisSurveyChart {
   // CSS selectors of all the important chart elements
   chartValuesSelector = '.chart_values';
   chartLabelsSelector = '.chart_labels';
+  chartLabelsInstanceSelector = '[data-chart-label-instance]';
   chartLegendsSelector = '.chart_legends';
   chartCanvasContainerSelector = '.chart_canvas-container';
   chartCanvasSelector = '.chart_canvas';
@@ -51,19 +52,22 @@ abstract class UrbisSurveyChart {
   chartDatasetWrapperSelector = '.chart_dataset-wrapper';
   chartDataToggleSelector = '.chart_data-toggle';
 
+  chartLabelsList: NodeListOf<HTMLElement>;
+
   protected abstract toggleChartData(): void;
 
   constructor(chartWrapper: HTMLDivElement) {
     this.chartWrapper = chartWrapper;
     this.chartCanvas = chartWrapper.querySelector(this.chartCanvasSelector);
 
-    const chartLabelsEl: HTMLElement | null =
-      chartWrapper.querySelector(`${this.chartLabelsSelector}[data-chart-label-primary="true"]`) ||
-      chartWrapper.querySelector(this.chartLabelsSelector);
+    this.chartLabelsList =
+      chartWrapper.querySelectorAll(
+        `${this.chartLabelsSelector}[data-chart-label-primary="true"]`
+      ) || chartWrapper.querySelectorAll(this.chartLabelsSelector);
 
     this.currentDataset = chartWrapper.querySelector(this.chartDatasetWrapperSelector);
 
-    this.chartLabels = this.extractDataAsString(chartLabelsEl);
+    this.chartLabels = this.extractDataAsString(this.chartLabelsList[0]);
 
     this.chartValues = this.extractDataAsNumber(
       chartWrapper.querySelector(this.chartValuesSelector)
@@ -107,10 +111,12 @@ abstract class UrbisSurveyChart {
             );
           }
 
+          this.chartLabels = this.extractDataAsString(this.chartLabelsList[toggleIndex]);
+
           try {
             // init child class toggleChartData function
             this.toggleChartData();
-            this.setChartDataToggleActiveClass(targetEl);
+            this.setChartToggleActiveClass(targetEl);
           } catch (e) {
             console.error('No `toggleChartData` function found in chart ', this.chartWrapper, {
               e,
@@ -124,10 +130,10 @@ abstract class UrbisSurveyChart {
       (this.chartWrapper?.querySelector(
         `${this.chartDataToggleSelector}:nth-of-type(1)`
       ) as HTMLElement) || null;
-    this.setChartDataToggleActiveClass(initTargetEl);
+    this.setChartToggleActiveClass(initTargetEl);
   }
 
-  protected setChartDataToggleActiveClass(targetEl: HTMLElement | null) {
+  protected setChartToggleActiveClass(targetEl: HTMLElement | null) {
     if (!targetEl) {
       console.error('No target element found for setting toggle active class', { targetEl });
       return;

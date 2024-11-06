@@ -101,7 +101,7 @@ class ChartJSInit {
       const chartType = chart.getAttribute('data-chart-type');
 
       switch (chartType) {
-        case 'bar':
+        case 'horizontal-bar':
           new BarChart(chart).init();
           break;
 
@@ -109,7 +109,7 @@ class ChartJSInit {
           new HorizontalDeviationChart(chart).init();
           break;
 
-        case 'stacked-bar':
+        case 'vertical-stacked-bar':
           new StackedBarChart(chart).init();
           break;
 
