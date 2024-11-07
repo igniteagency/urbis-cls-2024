@@ -1,32 +1,23 @@
 import Chart from 'chart.js/auto';
 import type { ChartDataset, CoreScaleOptions, Scale } from 'chart.js/auto';
-
-import { lighten } from '$utils/colorLighten';
 import UrbisSurveyChart, { type legendPosition, type legendAlignment } from '$charts/class/urbis-survey-chart';
+import { getCSSVar } from '$utils/getCSSVar';
 
-class BarChart extends UrbisSurveyChart {
+class HorizontalStackedBarChart extends UrbisSurveyChart {
   /**
-   * Legends for the current chart. Optional. Used for a grouped bar chart
+   * Legends for the stacked bar segments
    */
   legends: Array<string>;
 
   /**
-   * A list of chart values, for each legend
+   * A list of chart values for each stack segment
    */
   chartValuesList: Array<Array<number>> = [];
 
-  /**
-   * Minimum color lighten percentage from the base color
-   */
-  chartColorLightenMinPercent: number;
+  colorsList: Array<string> = [];
 
   /**
-   * Defines whether the bar chart is stacked or not
-   */
-  isStacked: boolean;
-
-  /**
-   * Whether the bar has any legends defined or not
+   * Whether the bar has any legends defined
    */
   hasLegends = true;
 
@@ -36,17 +27,20 @@ class BarChart extends UrbisSurveyChart {
     const legendsEl: HTMLElement | null = chartWrapper.querySelector(this.chartLegendsSelector);
     this.legends = this.extractDataAsString(legendsEl);
 
-    // If no legend is defined, add a default one
+    // Add default legend if none provided
     if (0 === this.legends.length) {
       this.hasLegends = false;
       this.legends.push('Value');
     }
 
     this.populateChartValuesList();
-
-    this.chartColorLightenMinPercent = Number(this.chartWrapper?.getAttribute('data-chart-color-min-lighten')) || 30;
-
-    this.isStacked = 'true' === chartWrapper.getAttribute('data-bar-stacked') || false;
+    
+    this.colorsList = [
+      getCSSVar( '--color--elements--background-alternate-1'),
+      getCSSVar('--color--elements--background-alternate-2'),
+      getCSSVar('--color--elements--background-alternate-3'),
+      getCSSVar('--color--elements--background-secondary'),
+    ]
 
     this.setCanvasContainerHeight();
   }
@@ -54,9 +48,8 @@ class BarChart extends UrbisSurveyChart {
   public init() {
     if (!this.chartCanvas) return undefined;
 
-    // context alias used for ticks callback function, because we also need its own contextual `this` to use an inbuilt function
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const barChartClass = this;
+    // Context alias for ticks callback
+    const stackedBarChartClass = this;
 
     this.chartInstance = new Chart(this.chartCanvas, {
       type: 'bar',
@@ -74,50 +67,43 @@ class BarChart extends UrbisSurveyChart {
         },
         scales: {
           x: {
-            stacked: this.isStacked,
+            stacked: true,
             ticks: {
               display: false,
-              callback: (index) => {
-                // only show the 0 value border
-                if (0 === index) {
-                  return '';
-                }
-                return null;
-              },
+              callback: (value) => `${value}%`,
             },
             grid: {
               display: false,
-              // drawBorder: false,
-              drawTicks: true,
             },
             min: 0,
             max: 100,
           },
           y: {
-            stacked: this.isStacked,
+            stacked: true,
             grid: {
               display: false,
             },
             ticks: {
-              // using traditional function call instead of arrow function to preserve `this` context and pass it on
               callback: function (val) {
-                return barChartClass.getYTicks(val, this);
+                return stackedBarChartClass.getYTicks(val, this);
               },
               crossAlign: 'far',
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / 2.5; // 25% of chart's width
+              scale.width = scale.chart.width / 2.5;
             },
           },
         },
         plugins: {
           legend: {
-            display: this.hasLegends ? true : false,
-            position:
-              <legendPosition>this.chartWrapper?.getAttribute('data-legends-position') || this.defaultLegendPosition,
-            align:
-              <legendAlignment>this.chartWrapper?.getAttribute('data-legends-align') || this.defaultLegendAlignment,
+            display: this.hasLegends,
+            position: <legendPosition>(
+              this.chartWrapper?.getAttribute('data-legends-position') || this.defaultLegendPosition
+            ),
+            align: <legendAlignment>(
+              this.chartWrapper?.getAttribute('data-legends-align') || this.defaultLegendAlignment
+            ),
           },
           tooltip: {
             callbacks: {
@@ -132,18 +118,15 @@ class BarChart extends UrbisSurveyChart {
           },
           datalabels: {
             display: (context) => {
-              // don't display labels for a value of 0
               const { dataIndex } = context;
-              return 0 !== context.dataset.data[dataIndex] ? true : false;
+              return 0 !== context.dataset.data[dataIndex];
             },
-            formatter: (value) => {
-              return `${value}%`;
-            },
+            formatter: (value) => `${value}%`,
             labels: this.getLabelObject(),
-            anchor: () => (this.isStacked ? 'center' : 'end'),
-            align: () => (this.isStacked ? 'center' : 'start'),
+            anchor: 'center',
+            align: 'center',
             color: (context) => {
-              return context.dataset.data[context.dataIndex] > 5 ? this.textLightColor : this.textDarkColor
+              return context.datasetIndex < 3 ? this.textDarkColor : this.textLightColor
             },
           },
         },
@@ -153,11 +136,9 @@ class BarChart extends UrbisSurveyChart {
     return this.chartInstance;
   }
 
-  // Populates the chartValuesList for the current dataset
   protected populateChartValuesList(): void {
-    const chartValuesElList: NodeListOf<HTMLElement> | undefined = this.currentDataset?.querySelectorAll(
-      this.chartValuesSelector
-    );
+    const chartValuesElList: NodeListOf<HTMLElement> | undefined = 
+      this.currentDataset?.querySelectorAll(this.chartValuesSelector);
 
     if (chartValuesElList?.length) {
       this.chartValuesList = [];
@@ -171,6 +152,12 @@ class BarChart extends UrbisSurveyChart {
     if (!this.chartInstance) {
       console.error('No chartInstance found', this.chartInstance, this.chartWrapper);
       return;
+    }
+
+    const chartTitle = this.getChartTitle();
+
+    if (this.chartInstance.config.options?.plugins?.title?.text) {
+      this.chartInstance.config.options.plugins.title.text = chartTitle;
     }
 
     this.populateChartValuesList();
@@ -188,7 +175,8 @@ class BarChart extends UrbisSurveyChart {
         data: this.chartValuesList[i],
         backgroundColor: this.getBackgroundColor(i),
         barThickness: 'flex',
-        barPercentage: 1,
+        barPercentage: 0.9,
+        categoryPercentage: 0.8,
         borderWidth: 0,
       });
     }
@@ -197,18 +185,16 @@ class BarChart extends UrbisSurveyChart {
   }
 
   /**
-   * Returns the color for the chart bar
-   *
-   * @param num The order number of legend item; starts from 0
-   * @returns Default or lightened color value
+   * @returns The title of chart from the HTML
    */
-  protected getBackgroundColor(num: number): string {
-    const color: string = this.activeToggle === 1 ? this.chartColor : window.colors.chart2022Dark;
+  private getChartTitle(): string {
+    const titleEl = this.currentDataset?.querySelector(this.chartTitleSelector) as HTMLElement | null;
+    return titleEl ? titleEl.innerText.trim() : '';
+  }
 
-    // the percent by which this chart chunk will lighten
-    const lightenValue: number = (100 - this.chartColorLightenMinPercent) / this.legends.length || 0;
-
-    return 0 === num ? color : lighten(color, lightenValue * num);
+  protected getBackgroundColor(index: number): string {
+    // get color in rotation from colorsList based on index
+    return this.colorsList[index % this.colorsList.length];
   }
 
   protected getYTicks(value: string | number, scale: Scale<CoreScaleOptions>): string | Array<string> {
@@ -218,10 +204,9 @@ class BarChart extends UrbisSurveyChart {
     if (!chartWidth) return label;
 
     const characterBreakpointValue: number = Math.round((chartWidth * (30 / 100)) / 6);
-
     let formattedLabel: string | Array<string> = label;
 
-    // break label into chunks of defined breakpoints characters to enable word wrap
+    // Break label into chunks for word wrap
     const breakpointRegex = new RegExp(`[\\s\\S]{1,${characterBreakpointValue}}(\\s|$)`, 'g');
     formattedLabel = formattedLabel.match(breakpointRegex) || [];
 
@@ -230,17 +215,14 @@ class BarChart extends UrbisSurveyChart {
 
   private setCanvasContainerHeight() {
     const bufferSpace = 30;
+    const canvasContainerEl: HTMLElement | null | undefined = 
+      this.chartWrapper?.querySelector(this.chartCanvasContainerSelector);
 
-    const canvasContainerEl: HTMLElement | null | undefined = this.chartWrapper?.querySelector(
-      this.chartCanvasContainerSelector
-    );
+    if (!canvasContainerEl) return;
 
-    if (!canvasContainerEl) {
-      return;
-    }
-
-    canvasContainerEl.style.minHeight = `${this.chartLabels.length * (this.maxBarThickness + bufferSpace)}px`;
+    canvasContainerEl.style.minHeight = 
+      `${this.chartLabels.length * (this.maxBarThickness + bufferSpace)}px`;
   }
 }
 
-export default BarChart;
+export default HorizontalStackedBarChart;

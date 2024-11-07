@@ -3,7 +3,10 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import BarChart from '$charts/bar';
 import HorizontalDeviationChart from '$charts/horizontal-deviation';
-import StackedBarChart from '$charts/stacked-bar';
+import VerticalStackedBarChart from '$charts/vertical-stacked-bar';
+import type { ColorThemes } from '$types/global';
+
+import HorizontalStackedBarChart from './horizontal-stacked-bar';
 
 class ChartJSInit {
   chartEls: Array<Chart>;
@@ -14,14 +17,16 @@ class ChartJSInit {
   scrollTriggerRefreshTimer: number | undefined;
 
   constructor() {
-    this.colorPrimaryText = getComputedStyle(document.documentElement).getPropertyValue(
-      '--color--elements--text-primary'
-    );
+    this.colorPrimaryText = window.colors.darkTextStatic;
 
     this.chartEls = [];
     this.charts = document.querySelectorAll('.chart_chart');
 
     this.init();
+
+    document.addEventListener('themeChange', (ev) => {
+      this.onThemeChange((ev as CustomEvent).detail);
+    });
 
     // this.appendScriptsAndInit();
   }
@@ -110,7 +115,11 @@ class ChartJSInit {
           break;
 
         case 'vertical-stacked-bar':
-          new StackedBarChart(chart).init();
+          new VerticalStackedBarChart(chart).init();
+          break;
+
+        case 'horizontal-stacked-bar':
+          new HorizontalStackedBarChart(chart).init();
           break;
 
         default:
@@ -137,6 +146,14 @@ class ChartJSInit {
     window.Webflow.resize.on(() => {
       this.setDefaultFontSize();
     });
+  }
+
+  private onThemeChange(currentTheme: ColorThemes) {
+    if (currentTheme === 'dark') {
+      this.colorPrimaryText = window.colors.lightTextStatic;
+    } else {
+      this.colorPrimaryText = window.colors.darkTextStatic;
+    }
   }
 }
 

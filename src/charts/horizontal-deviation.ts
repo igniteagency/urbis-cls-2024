@@ -87,15 +87,14 @@ class HorizontalDeviationChart extends BarChart {
             formatter: (value) => {
               return `${value}%`;
             },
-            labels: {
-              title: {
-                font: {
-                  weight: 'bold',
-                },
-              },
-            },
+            labels: this.getLabelObject(),
             anchor: () => (this.isStacked ? 'center' : 'end'),
             align: () => (this.isStacked ? 'center' : 'start'),
+            color: (context) => {
+              const val = context.dataset.data[context.dataIndex];
+              if (!val) return this.textDarkColor;
+              return val > 5 || val < -5 ? this.textLightColor : this.textDarkColor;
+            },
           },
         },
       },
@@ -114,7 +113,8 @@ class HorizontalDeviationChart extends BarChart {
         backgroundColor: (context: ScriptableContext<'bar'>) => {
           const index = context.dataIndex;
           const value = context.dataset.data[index];
-          return 0 > value ? lighten(this.chartColor, this.colorLighten) : this.chartColor;
+          const color = this.activeToggle === 1 ? this.chartColor : window.colors.chart2022Dark;
+          return 0 > value ? lighten(color, this.colorLighten) : color;
         },
         barThickness: 'flex',
         barPercentage: 1,

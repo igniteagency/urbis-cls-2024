@@ -5,7 +5,7 @@ import type { Context } from 'chartjs-plugin-datalabels';
 import { lighten } from '$utils/colorLighten';
 import UrbisSurveyChart, { type legendAlignment, type legendPosition } from '$charts/class/urbis-survey-chart';
 
-class StackedBarChart extends UrbisSurveyChart {
+class VerticalStackedBarChart extends UrbisSurveyChart {
   /**
    * Title of the chart; if defined
    */
@@ -164,13 +164,10 @@ class StackedBarChart extends UrbisSurveyChart {
               // don't display labels for a value of 0x
               return this.getBarLegendValue(context) ? true : false;
             },
-            labels: {
-              title: {
-                font: {
-                  weight: 'bold',
-                },
-              },
-            },
+            labels: this.getLabelObject(),
+            color: (context) => {
+              return context.datasetIndex == 0 ? this.textDarkColor : this.textLightColor;
+            }
           },
         },
       },
@@ -342,13 +339,13 @@ class StackedBarChart extends UrbisSurveyChart {
    * @returns Default or lightened color value
    */
   private getBackgroundColor(num: number): string {
-    const color: string = this.chartColor;
+    const color: string = this.activeToggle === 1 ? this.chartColor : window.colors.chart2022Dark;
 
     // the percent by which this chart chunk will lighten
     const lightenValue: number = (100 - this.chartColorLightenMinPercent) / this.legends.length || 0;
 
-    return 0 === num ? color : lighten(this.chartColor, lightenValue * num);
+    return 0 === num ? color : lighten(color, lightenValue * num);
   }
 }
 
-export default StackedBarChart;
+export default VerticalStackedBarChart;

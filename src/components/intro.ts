@@ -30,12 +30,28 @@ export function IntroAnimation() {
     });
 
     // Set each line to start at yPercent -100 (above)
-    gsap.set(message.querySelectorAll('.line'), { yPercent: 100 });
+    gsap.set(message.querySelectorAll('.line'), { yPercent: 120 });
   });
 
-  // window.gsap.set('.hero-header_background-video-wrapper', {
-  //   clipPath: 'inset(50%)',
-  // });
+  // Scroll event to trigger `.menu_wrapper` animation
+  let menuAnimationTriggered = false;
+
+  window.addEventListener('scroll', () => {
+    console.log('Scroll Y position:', window.scrollY); // Log the current scroll position
+
+    if (!menuAnimationTriggered && window.scrollY > 5) {
+      // Adjust `5` as needed for your case
+      menuAnimationTriggered = true;
+      console.log('Scroll detected, animating menu wrapper'); // Debugging log to indicate the condition was met
+
+      // Animate `.menu_wrapper` independently
+      gsap.to('.menu_wrapper', {
+        y: 0,
+        duration: 1,
+        ease: 'power4.out',
+      });
+    }
+  });
 
   introTl.to('.loader-number_wrap', {
     height: '100%',
@@ -149,7 +165,7 @@ export function IntroAnimation() {
       messagesTl.to(
         message.querySelectorAll('.line'),
         {
-          yPercent: -100, // Animate line downward to hide
+          yPercent: -120, // Animate line downward to hide
           duration: 1,
           ease: 'power4.in',
           stagger: 0.2,
@@ -192,4 +208,61 @@ export function IntroAnimation() {
   );
 
   //introTl.play('logoExit');
+
+  // Select all img elements
+  const images = document.querySelectorAll('.reveal-image');
+
+  images.forEach((img) => {
+    // Set initial clip-path with GSAP to ensure it's recognized
+    gsap.set(img, { clipPath: 'inset(0 100% 0 0)' });
+
+    // Create ScrollTrigger animation
+    gsap.to(img, {
+      clipPath: 'inset(0 0% 0 0)', // Fully reveal the image
+      duration: 1.5, // Adjust duration for visual effect
+      ease: 'power4.out', // Smooth easing function
+      scrollTrigger: {
+        trigger: img,
+        start: 'top 80%', // Trigger when the top of the image enters 90% of the viewport height
+        toggleActions: 'play none none none',
+        //markers: true, // Debug markers to visualize trigger points
+      },
+    });
+  });
+
+  const H1s = document.querySelectorAll('.heading-style-h1');
+
+  H1s.forEach((heading) => {
+    // Use SplitType to split the heading into lines
+    const splitText = new window.SplitType(heading, {
+      types: 'lines',
+      tagName: 'span',
+    });
+
+    // Wrap each line in a parent div for masking effect
+    splitText.lines.forEach((line) => {
+      const wrapper = document.createElement('div');
+      wrapper.style.overflow = 'hidden';
+      wrapper.style.display = 'inline-block'; // Keeps lines aligned horizontally
+
+      line.parentNode.insertBefore(wrapper, line);
+      wrapper.appendChild(line);
+    });
+
+    // Set each line to start at yPercent 110 (below the view)
+    gsap.set(heading.querySelectorAll('.line'), { yPercent: 110 });
+
+    // ScrollTrigger animation to move lines into view
+    gsap.to(heading.querySelectorAll('.line'), {
+      yPercent: 0, // Move lines to their original position
+      duration: 1, // Duration of the animation
+      ease: 'power4.out', // Smooth easing for entry
+      stagger: 0.2, // Stagger the animation for each line
+      scrollTrigger: {
+        trigger: heading, // The heading itself triggers the animation
+        start: 'top 80%', // Start animation when the top of the heading is at 90% of viewport
+        toggleActions: 'play none none none', // Animation plays once when triggered
+      },
+    });
+  });
 }
