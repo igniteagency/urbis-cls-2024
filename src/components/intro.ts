@@ -30,12 +30,28 @@ export function IntroAnimation() {
     });
 
     // Set each line to start at yPercent -100 (above)
-    gsap.set(message.querySelectorAll('.line'), { yPercent: 100 });
+    gsap.set(message.querySelectorAll('.line'), { yPercent: 120 });
   });
 
-  // window.gsap.set('.hero-header_background-video-wrapper', {
-  //   clipPath: 'inset(50%)',
-  // });
+  // Scroll event to trigger `.menu_wrapper` animation
+  let menuAnimationTriggered = false;
+
+  window.addEventListener('scroll', () => {
+    console.log('Scroll Y position:', window.scrollY); // Log the current scroll position
+
+    if (!menuAnimationTriggered && window.scrollY > 5) {
+      // Adjust `5` as needed for your case
+      menuAnimationTriggered = true;
+      console.log('Scroll detected, animating menu wrapper'); // Debugging log to indicate the condition was met
+
+      // Animate `.menu_wrapper` independently
+      gsap.to('.menu_wrapper', {
+        y: 0,
+        duration: 1,
+        ease: 'power4.out',
+      });
+    }
+  });
 
   introTl.to('.loader-number_wrap', {
     height: '100%',
@@ -149,7 +165,7 @@ export function IntroAnimation() {
       messagesTl.to(
         message.querySelectorAll('.line'),
         {
-          yPercent: -100, // Animate line downward to hide
+          yPercent: -120, // Animate line downward to hide
           duration: 1,
           ease: 'power4.in',
           stagger: 0.2,
