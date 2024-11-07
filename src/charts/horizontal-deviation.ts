@@ -87,17 +87,12 @@ class HorizontalDeviationChart extends BarChart {
             formatter: (value) => {
               return `${value}%`;
             },
-            labels: {
-              title: {
-                font: {
-                  weight: 'bold',
-                },
-              },
-            },
+            labels: this.getLabelObject(),
             anchor: () => (this.isStacked ? 'center' : 'end'),
             align: () => (this.isStacked ? 'center' : 'start'),
             color: (context) => {
               const val = context.dataset.data[context.dataIndex];
+              if (!val) return this.textDarkColor;
               return val > 5 || val < -5 ? this.textLightColor : this.textDarkColor;
             },
           },

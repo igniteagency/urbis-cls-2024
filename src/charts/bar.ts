@@ -139,13 +139,7 @@ class BarChart extends UrbisSurveyChart {
             formatter: (value) => {
               return `${value}%`;
             },
-            labels: {
-              title: {
-                font: {
-                  weight: 'bold',
-                },
-              },
-            },
+            labels: this.getLabelObject(),
             anchor: () => (this.isStacked ? 'center' : 'end'),
             align: () => (this.isStacked ? 'center' : 'start'),
             color: (context) => {

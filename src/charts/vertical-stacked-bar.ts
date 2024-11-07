@@ -164,13 +164,7 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
               // don't display labels for a value of 0x
               return this.getBarLegendValue(context) ? true : false;
             },
-            labels: {
-              title: {
-                font: {
-                  weight: 'bold',
-                },
-              },
-            },
+            labels: this.getLabelObject(),
             color: (context) => {
               return context.datasetIndex == 0 ? this.textDarkColor : this.textLightColor;
             }

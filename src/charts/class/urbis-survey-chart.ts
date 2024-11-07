@@ -1,4 +1,6 @@
 import type Chart from 'chart.js/auto';
+import type { _DeepPartialObject } from 'chart.js/dist/types/utils';
+import type { LabelOptions } from 'chartjs-plugin-datalabels/types/options';
 
 export type legendPosition = 'top' | 'left' | 'bottom' | 'right';
 export type legendAlignment = 'start' | 'center' | 'end';
@@ -175,6 +177,16 @@ abstract class UrbisSurveyChart {
 
   protected getCSSVariableValue(variableName: string) {
     return getComputedStyle(document.documentElement).getPropertyValue(variableName);
+  }
+
+  protected getLabelObject(): _DeepPartialObject<Record<string, LabelOptions | null>> {
+    return {
+      title: {
+        font: {
+          weight: 'bold',
+        },
+      },
+    };
   }
 }
 
