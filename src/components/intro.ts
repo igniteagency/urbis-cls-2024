@@ -33,9 +33,9 @@ export function IntroAnimation() {
     gsap.set(message.querySelectorAll('.line'), { yPercent: 100 });
   });
 
-  window.gsap.set('.hero-header_background-video-wrapper', {
-    clipPath: 'inset(50%)',
-  });
+  // window.gsap.set('.hero-header_background-video-wrapper', {
+  //   clipPath: 'inset(50%)',
+  // });
 
   introTl.to('.loader-number_wrap', {
     height: '100%',
@@ -67,7 +67,7 @@ export function IntroAnimation() {
       clipPath: 'inset(0 0 100% 0)',
       duration: 1,
     },
-    '-=1.5'
+    '-=1'
   );
 
   introTl.from(
@@ -78,7 +78,7 @@ export function IntroAnimation() {
       duration: 1,
       stagger: 0.2,
     },
-    '>'
+    '-=0.5'
   );
 
   introTl.from(
@@ -102,18 +102,42 @@ export function IntroAnimation() {
     '>'
   );
 
+  // introTl.to(
+  //   '.hero-header_background-video-wrapper',
+  //   {
+  //     clipPath: 'inset(0%)',
+  //     duration: 2,
+  //   },
+  //   '<'
+  // );
+
   introTl.to(
-    '.hero-header_background-video-wrapper',
+    '.intro-overlays.top, .intro-overlays.bottom',
     {
-      clipPath: 'inset(0%)',
+      scaleY: 0,
+      duration: 3,
+      delay: 0.2,
+    },
+    '<'
+  );
+
+  // Add overlay animation to introTl timeline
+  introTl.to(
+    '.intro-overlays.left, .intro-overlays.right',
+    {
+      scaleX: 0,
       duration: 2,
     },
     '<'
   );
 
+  // Create a nested timeline for introMessages sequence
+  const messagesTl = gsap.timeline();
+
+  // Add each message's animations to messagesTl
   introMessages.forEach((message, index) => {
     // Animate lines in for each .intro_message
-    introTl.to(message.querySelectorAll('.line'), {
+    messagesTl.to(message.querySelectorAll('.line'), {
       yPercent: 0, // Animate line to visible position
       duration: 1,
       ease: 'power4.out',
@@ -122,7 +146,7 @@ export function IntroAnimation() {
 
     // Only add the exit animation if it's not the last message
     if (index < introMessages.length - 1) {
-      introTl.to(
+      messagesTl.to(
         message.querySelectorAll('.line'),
         {
           yPercent: -100, // Animate line downward to hide
@@ -131,18 +155,22 @@ export function IntroAnimation() {
           stagger: 0.2,
           delay: 1.5, // Wait before starting the exit animation
         },
-        '-=0.5'
+        '-=0.5' // Overlap with the next animation by 0.5 seconds
       );
     }
 
     // Add a dummy, zero-duration tween to mark the end of this sequence
-    introTl.to({}, { duration: 0 });
+    messagesTl.to({}, { duration: 0 });
   });
 
+  // Add messagesTl to introTl with a start offset of '-=1'
+  introTl.add(messagesTl, '-=1.5');
+
+  // Add the next animation after messages sequence
   introTl.to(
     '.intro_logo',
     {
-      yPercent: 140,
+      yPercent: 122,
     },
     '-=1'
   );
