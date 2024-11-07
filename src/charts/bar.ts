@@ -148,6 +148,9 @@ class BarChart extends UrbisSurveyChart {
             },
             anchor: () => (this.isStacked ? 'center' : 'end'),
             align: () => (this.isStacked ? 'center' : 'start'),
+            color: (context) => {
+              return context.dataset.data[context.dataIndex] > 5 ? this.textLightColor : this.textDarkColor
+            },
           },
         },
       },

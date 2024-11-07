@@ -96,6 +96,10 @@ class HorizontalDeviationChart extends BarChart {
             },
             anchor: () => (this.isStacked ? 'center' : 'end'),
             align: () => (this.isStacked ? 'center' : 'start'),
+            color: (context) => {
+              const val = context.dataset.data[context.dataIndex];
+              return val > 5 || val < -5 ? this.textLightColor : this.textDarkColor;
+            },
           },
         },
       },

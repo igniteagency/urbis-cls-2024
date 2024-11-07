@@ -52,6 +52,9 @@ abstract class UrbisSurveyChart {
   chartDatasetWrapperSelector = '.chart_dataset-wrapper';
   chartDataToggleSelector = '.chart_data-toggle';
 
+  textDarkColor: string;
+  textLightColor: string;
+
   chartLabelsList: NodeListOf<HTMLElement>;
 
   protected abstract toggleChartData(): void;
@@ -77,6 +80,9 @@ abstract class UrbisSurveyChart {
       getComputedStyle(document.documentElement).getPropertyValue(
         '--color--elements--background-secondary'
       );
+
+    this.textDarkColor = this.getCSSVariableValue('--color--elements--text-dark-static');
+    this.textLightColor = this.getCSSVariableValue('--color--elements--text-light-static');
 
     this.hasChartDataToggle =
       chartWrapper.querySelectorAll(this.chartDataToggleSelector).length > 0;
@@ -165,6 +171,10 @@ abstract class UrbisSurveyChart {
           .split('|')
           .map((value) => Number(value))
       : [];
+  }
+
+  protected getCSSVariableValue(variableName: string) {
+    return getComputedStyle(document.documentElement).getPropertyValue(variableName);
   }
 }
 

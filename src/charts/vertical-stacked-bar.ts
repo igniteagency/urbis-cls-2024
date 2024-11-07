@@ -171,6 +171,9 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
                 },
               },
             },
+            color: (context) => {
+              return context.datasetIndex == 0 ? this.textDarkColor : this.textLightColor;
+            }
           },
         },
       },
