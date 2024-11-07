@@ -3,7 +3,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import BarChart from '$charts/bar';
 import HorizontalDeviationChart from '$charts/horizontal-deviation';
-import StackedBarChart from '$charts/stacked-bar';
+import VerticalStackedBarChart from '$charts/vertical-stacked-bar';
 
 class ChartJSInit {
   chartEls: Array<Chart>;
@@ -110,7 +110,7 @@ class ChartJSInit {
           break;
 
         case 'vertical-stacked-bar':
-          new StackedBarChart(chart).init();
+          new VerticalStackedBarChart(chart).init();
           break;
 
         default:

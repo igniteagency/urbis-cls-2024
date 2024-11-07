@@ -5,7 +5,7 @@ import type { Context } from 'chartjs-plugin-datalabels';
 import { lighten } from '$utils/colorLighten';
 import UrbisSurveyChart, { type legendAlignment, type legendPosition } from '$charts/class/urbis-survey-chart';
 
-class StackedBarChart extends UrbisSurveyChart {
+class VerticalStackedBarChart extends UrbisSurveyChart {
   /**
    * Title of the chart; if defined
    */
@@ -351,4 +351,4 @@ class StackedBarChart extends UrbisSurveyChart {
   }
 }
 
-export default StackedBarChart;
+export default VerticalStackedBarChart;
