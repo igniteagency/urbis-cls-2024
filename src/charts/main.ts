@@ -5,6 +5,8 @@ import BarChart from '$charts/bar';
 import HorizontalDeviationChart from '$charts/horizontal-deviation';
 import VerticalStackedBarChart from '$charts/vertical-stacked-bar';
 
+import HorizontalStackedBarChart from './horizontal-stacked-bar';
+
 class ChartJSInit {
   chartEls: Array<Chart>;
   charts: NodeListOf<HTMLDivElement> | null;
@@ -111,6 +113,10 @@ class ChartJSInit {
 
         case 'vertical-stacked-bar':
           new VerticalStackedBarChart(chart).init();
+          break;
+
+        case 'horizontal-stacked-bar':
+          new HorizontalStackedBarChart(chart).init();
           break;
 
         default:
