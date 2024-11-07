@@ -2,6 +2,8 @@ import type Chart from 'chart.js/auto';
 import type { _DeepPartialObject } from 'chart.js/dist/types/utils';
 import type { LabelOptions } from 'chartjs-plugin-datalabels/types/options';
 
+import type { ColorThemes } from '$types/global';
+
 export type legendPosition = 'top' | 'left' | 'bottom' | 'right';
 export type legendAlignment = 'start' | 'center' | 'end';
 
@@ -54,11 +56,20 @@ abstract class UrbisSurveyChart {
   chartDatasetWrapperSelector = '.chart_dataset-wrapper';
   chartDataToggleSelector = '.chart_data-toggle';
 
+  /**
+   * Dynamic chart colors that invert as per theme
+   */
   textDarkColor: string;
   textLightColor: string;
 
   chartLabelsList: NodeListOf<HTMLElement>;
 
+  activeToggle: number = 1;
+
+  /**
+   * triggers on chart toggle switch
+   * @param toggleInstance starting from 1
+   */
   protected abstract toggleChartData(): void;
 
   constructor(chartWrapper: HTMLDivElement) {
@@ -77,14 +88,10 @@ abstract class UrbisSurveyChart {
     this.chartValues = this.extractDataAsNumber(
       chartWrapper.querySelector(this.chartValuesSelector)
     );
-    this.chartColor =
-      chartWrapper.getAttribute('data-chart-color') ||
-      getComputedStyle(document.documentElement).getPropertyValue(
-        '--color--elements--background-secondary'
-      );
+    this.chartColor = chartWrapper.getAttribute('data-chart-color') || window.colors.chart2024Dark;
 
-    this.textDarkColor = this.getCSSVariableValue('--color--elements--text-dark-static');
-    this.textLightColor = this.getCSSVariableValue('--color--elements--text-light-static');
+    this.textDarkColor = window.colors.darkTextStatic;
+    this.textLightColor = window.colors.lightTextStatic;
 
     this.hasChartDataToggle =
       chartWrapper.querySelectorAll(this.chartDataToggleSelector).length > 0;
@@ -97,6 +104,10 @@ abstract class UrbisSurveyChart {
     if (this.hasChartDataToggle) {
       this.setChartDataToggleListener();
     }
+
+    document.addEventListener('themeChange', (ev) => {
+      this.onThemeChange((ev as CustomEvent).detail);
+    });
   }
 
   protected setChartDataToggleListener() {
@@ -106,6 +117,8 @@ abstract class UrbisSurveyChart {
         toggleEl.addEventListener('click', (ev) => {
           const toggleInstance: number = toggleIndex + 1;
           const targetEl = ev.target as HTMLElement;
+
+          this.activeToggle = toggleIndex + 1;
 
           this.currentDataset =
             this.chartWrapper?.querySelector(
@@ -175,10 +188,6 @@ abstract class UrbisSurveyChart {
       : [];
   }
 
-  protected getCSSVariableValue(variableName: string) {
-    return getComputedStyle(document.documentElement).getPropertyValue(variableName);
-  }
-
   protected getLabelObject(): _DeepPartialObject<Record<string, LabelOptions | null>> {
     return {
       title: {
@@ -187,6 +196,30 @@ abstract class UrbisSurveyChart {
         },
       },
     };
+  }
+
+  protected onThemeChange(currentTheme: ColorThemes) {
+    if (currentTheme === 'dark') {
+      this.textDarkColor = window.colors.lightTextStatic;
+      this.textLightColor = window.colors.darkTextStatic;
+    } else {
+      this.textDarkColor = window.colors.darkTextStatic;
+      this.textLightColor = window.colors.lightTextStatic;
+    }
+
+    if (!this.chartInstance) {
+      return;
+    }
+
+    this.chartInstance.options.plugins.title.color = this.textDarkColor;
+    this.chartInstance.options.plugins.legend.labels.color = this.textDarkColor;
+    this.chartInstance.options.scales.x.ticks.color = this.textDarkColor;
+    this.chartInstance.options.scales.y.ticks.color = this.textDarkColor;
+    this.chartInstance.options.scales.x.title.color = this.textDarkColor;
+    this.chartInstance.options.scales.y.title.color = this.textDarkColor;
+
+    // console.log('chart update on theme change', { currentTheme });
+    this.chartInstance?.update();
   }
 }
 

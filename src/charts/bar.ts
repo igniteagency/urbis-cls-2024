@@ -203,12 +203,12 @@ class BarChart extends UrbisSurveyChart {
    * @returns Default or lightened color value
    */
   protected getBackgroundColor(num: number): string {
-    const color: string = this.chartColor;
+    const color: string = this.activeToggle === 1 ? this.chartColor : window.colors.chart2022Dark;
 
     // the percent by which this chart chunk will lighten
     const lightenValue: number = (100 - this.chartColorLightenMinPercent) / this.legends.length || 0;
 
-    return 0 === num ? color : lighten(this.chartColor, lightenValue * num);
+    return 0 === num ? color : lighten(color, lightenValue * num);
   }
 
   protected getYTicks(value: string | number, scale: Scale<CoreScaleOptions>): string | Array<string> {

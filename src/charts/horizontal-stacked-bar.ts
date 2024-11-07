@@ -1,6 +1,7 @@
 import Chart from 'chart.js/auto';
 import type { ChartDataset, CoreScaleOptions, Scale } from 'chart.js/auto';
 import UrbisSurveyChart, { type legendPosition, type legendAlignment } from '$charts/class/urbis-survey-chart';
+import { getCSSVar } from '$utils/getCSSVar';
 
 class HorizontalStackedBarChart extends UrbisSurveyChart {
   /**
@@ -35,10 +36,10 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
     this.populateChartValuesList();
     
     this.colorsList = [
-      this.getCSSVariableValue( '--color--elements--background-alternate-1'),
-      this.getCSSVariableValue('--color--elements--background-alternate-2'),
-      this.getCSSVariableValue('--color--elements--background-alternate-3'),
-      this.getCSSVariableValue('--color--elements--background-secondary'),
+      getCSSVar( '--color--elements--background-alternate-1'),
+      getCSSVar('--color--elements--background-alternate-2'),
+      getCSSVar('--color--elements--background-alternate-3'),
+      getCSSVar('--color--elements--background-secondary'),
     ]
 
     this.setCanvasContainerHeight();
@@ -68,6 +69,7 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
           x: {
             stacked: true,
             ticks: {
+              display: false,
               callback: (value) => `${value}%`,
             },
             grid: {
@@ -152,6 +154,12 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
       return;
     }
 
+    const chartTitle = this.getChartTitle();
+
+    if (this.chartInstance.config.options?.plugins?.title?.text) {
+      this.chartInstance.config.options.plugins.title.text = chartTitle;
+    }
+
     this.populateChartValuesList();
     this.chartInstance.config.data.datasets = this.generateDataset();
     this.chartInstance.config.data.labels = this.chartLabels;
@@ -174,6 +182,14 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
     }
 
     return dataset;
+  }
+
+  /**
+   * @returns The title of chart from the HTML
+   */
+  private getChartTitle(): string {
+    const titleEl = this.currentDataset?.querySelector(this.chartTitleSelector) as HTMLElement | null;
+    return titleEl ? titleEl.innerText.trim() : '';
   }
 
   protected getBackgroundColor(index: number): string {
