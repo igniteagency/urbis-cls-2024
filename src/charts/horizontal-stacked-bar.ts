@@ -91,7 +91,7 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / 2.5;
+              scale.width = scale.chart.width / this.horizontalChartWidthQuotient;
             },
           },
         },

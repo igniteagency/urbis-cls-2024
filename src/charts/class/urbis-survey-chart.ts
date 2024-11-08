@@ -68,6 +68,11 @@ abstract class UrbisSurveyChart {
   activeToggle: number = 1;
 
   /**
+   * 25% of chart's width
+   */
+  horizontalChartWidthQuotient = 2.5;
+
+  /**
    * triggers on chart toggle switch
    * @param toggleInstance starting from 1
    */

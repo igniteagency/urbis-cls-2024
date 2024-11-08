@@ -63,7 +63,7 @@ class HorizontalDeviationChart extends BarChart {
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / 3; // 33% of chart's width
+              scale.width = scale.chart.width / this.horizontalChartWidthDivider;
             },
           },
         },

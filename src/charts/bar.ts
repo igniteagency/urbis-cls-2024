@@ -107,7 +107,7 @@ class BarChart extends UrbisSurveyChart {
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / 2.5; // 25% of chart's width
+              scale.width = scale.chart.width / this.horizontalChartWidthDivider;
             },
           },
         },
