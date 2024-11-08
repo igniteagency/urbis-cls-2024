@@ -1,12 +1,11 @@
 import Chart from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import BarChart from '$charts/bar';
-import HorizontalDeviationChart from '$charts/horizontal-deviation';
-import VerticalStackedBarChart from '$charts/vertical-stacked-bar';
+import BarChart from '$charts/types/bar';
+import HorizontalDeviationChart from '$charts/types/horizontal-deviation';
+import HorizontalStackedBarChart from '$charts/types/horizontal-stacked-bar';
+import VerticalStackedBarChart from '$charts/types/vertical-stacked-bar';
 import type { ColorThemes } from '$types/global';
-
-import HorizontalStackedBarChart from './horizontal-stacked-bar';
 
 class ChartJSInit {
   chartEls: Array<Chart>;

@@ -1,7 +1,7 @@
 import Chart from 'chart.js/auto';
 import type { ChartDataset, ScriptableContext } from 'chart.js/auto';
 
-import BarChart from '$charts/bar';
+import BarChart from '$charts/types/bar';
 import { lighten } from '$utils/colorLighten';
 
 class HorizontalDeviationChart extends BarChart {
