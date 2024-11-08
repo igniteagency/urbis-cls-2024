@@ -5,7 +5,9 @@ import SplitType from 'split-type';
 import ChartJSInit from '$charts/main';
 import { getCSSVar } from '$utils/getCSSVar';
 
+import { headingReveal } from './components/heading-reveal';
 import { IntroAnimation } from './components/intro';
+import { revealImages } from './components/reveal-images';
 import TableChart from './components/table-data';
 import VimeoVideoControls from './components/vimeo-video-player';
 
@@ -30,4 +32,6 @@ window.Webflow?.push(() => {
   new ChartJSInit();
 
   IntroAnimation();
+  headingReveal();
+  revealImages();
 });
