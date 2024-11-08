@@ -5,6 +5,7 @@ import SplitType from 'split-type';
 import ChartJSInit from '$charts/main';
 import { getCSSVar } from '$utils/getCSSVar';
 
+import { animatedDetailsAccordions } from './components/accordions';
 import { headingReveal } from './components/heading-reveal';
 import { IntroAnimation } from './components/intro';
 import { revealImages } from './components/reveal-images';
@@ -30,8 +31,9 @@ window.Webflow?.push(() => {
 
   new TableChart();
   new ChartJSInit();
-
   IntroAnimation();
+  animatedDetailsAccordions();
+
   headingReveal();
   revealImages();
 });
