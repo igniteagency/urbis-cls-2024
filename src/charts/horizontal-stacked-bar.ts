@@ -70,7 +70,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
             stacked: true,
             ticks: {
               display: false,
-              callback: (value) => `${value}%`,
             },
             grid: {
               display: false,
@@ -119,13 +118,7 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
           datalabels: {
             display: (context) => {
               const value = context.dataset.data[context.dataIndex];
-              try {
-                if (value <= 5) 
-                  return false;
-              } catch (e) {
-                return true;
-              }
-              return true;
+              return this.shouldDisplayDatalabel(value as number);
             },
             formatter: (value) => `${value}%`,
             labels: this.getLabelObject(),

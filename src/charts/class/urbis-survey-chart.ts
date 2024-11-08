@@ -267,6 +267,18 @@ abstract class UrbisSurveyChart {
 
     canvasContainerEl.style.minHeight = `${this.chartLabels.length * (this.maxBarThickness + bufferSpace)}px`;
   }
+
+  /**
+   * Whether to show the datalabel value on the bar or not
+   * Hides datalabels if the value is between -5 and 5
+   * @param value datalabel value
+   */
+  protected shouldDisplayDatalabel(value: number) {
+    if (value <= 5 && value >= -5) {
+      return false;
+    }
+    return true;
+  }
 }
 
 export default UrbisSurveyChart;
