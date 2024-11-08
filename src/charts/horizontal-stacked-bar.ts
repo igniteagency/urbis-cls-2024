@@ -118,8 +118,14 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
           },
           datalabels: {
             display: (context) => {
-              const { dataIndex } = context;
-              return 0 !== context.dataset.data[dataIndex];
+              const value = context.dataset.data[context.dataIndex];
+              try {
+                if (value <= 5) 
+                  return false;
+              } catch (e) {
+                return true;
+              }
+              return true;
             },
             formatter: (value) => `${value}%`,
             labels: this.getLabelObject(),

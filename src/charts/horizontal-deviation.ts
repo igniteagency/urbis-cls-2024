@@ -80,9 +80,14 @@ class HorizontalDeviationChart extends BarChart {
           },
           datalabels: {
             display: (context) => {
-              // don't display labels for a value of 0
-              const { dataIndex } = context;
-              return 0 !== context.dataset.data[dataIndex] ? true : false;
+              // don't display labels for a values smaller than 5
+              const value = context.dataset.data[context.dataIndex];
+              try {
+                if (value <= 5 && value >= -5) return false;
+              } catch (e) {
+                return true;
+              }
+              return true;
             },
             formatter: (value) => {
               return `${value}%`;

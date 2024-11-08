@@ -132,9 +132,15 @@ class BarChart extends UrbisSurveyChart {
           },
           datalabels: {
             display: (context) => {
-              // don't display labels for a value of 0
-              const { dataIndex } = context;
-              return 0 !== context.dataset.data[dataIndex] ? true : false;
+              // don't display labels for a values less than 5
+              const value = context.dataset.data[context.dataIndex];
+              try {
+                if (value <= 5) 
+                  return false;
+              } catch (e) {
+                return true;
+              }
+              return true;
             },
             formatter: (value) => {
               return `${value}%`;
@@ -142,9 +148,7 @@ class BarChart extends UrbisSurveyChart {
             labels: this.getLabelObject(),
             anchor: () => (this.isStacked ? 'center' : 'end'),
             align: () => (this.isStacked ? 'center' : 'start'),
-            color: (context) => {
-              return context.dataset.data[context.dataIndex] > 5 ? this.textLightColor : this.textDarkColor
-            },
+            color: this.textLightColor,
           },
         },
       },
