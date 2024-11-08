@@ -35,24 +35,25 @@ export function IntroAnimation() {
   });
 
   // Scroll event to trigger `.menu_wrapper` animation
-  let menuAnimationTriggered = false;
+  let menuShown = false;
+  const showMenuOnScroll = () => {
+    console.log('Scroll Y position:', window.scrollY);
 
-  window.addEventListener('scroll', () => {
-    console.log('Scroll Y position:', window.scrollY); // Log the current scroll position
+    if (!menuShown && window.scrollY > 5) {
+      menuShown = true;
 
-    if (!menuAnimationTriggered && window.scrollY > 5) {
-      // Adjust `5` as needed for your case
-      menuAnimationTriggered = true;
-      console.log('Scroll detected, animating menu wrapper'); // Debugging log to indicate the condition was met
-
-      // Animate `.menu_wrapper` independently
       window.gsap.to('.menu_wrapper', {
         y: 0,
         duration: 1,
         ease: 'power4.out',
       });
+
+      // Remove the event listener since animation has been triggered
+      window.removeEventListener('scroll', showMenuOnScroll);
     }
-  });
+  };
+
+  window.addEventListener('scroll', showMenuOnScroll);
 
   introTl.to('.loader-number_wrap', {
     height: '100%',
