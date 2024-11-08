@@ -1,4 +1,5 @@
 import type Chart from 'chart.js/auto';
+import type { CoreScaleOptions, Scale } from 'chart.js/auto';
 import type { _DeepPartialObject } from 'chart.js/dist/types/utils';
 import type { LabelOptions } from 'chartjs-plugin-datalabels/types/options';
 
@@ -220,6 +221,46 @@ abstract class UrbisSurveyChart {
 
     // console.log('chart update on theme change', { currentTheme });
     this.chartInstance?.update();
+  }
+
+  /**
+   * Responsive text wrapping on the Y axis
+   */
+  protected getYTicks(
+    value: string | number,
+    scale: Scale<CoreScaleOptions>
+  ): string | Array<string> {
+    const chartWidth: number = scale.chart.width;
+    const label = scale.getLabelForValue(Number(value));
+
+    if (!chartWidth) return label;
+
+    const characterBreakpointValue: number = Math.round((chartWidth * (30 / 100)) / 6);
+
+    let formattedLabel: string | Array<string> = label;
+
+    // break label into chunks of defined breakpoints characters to enable word wrap
+    const breakpointRegex = new RegExp(`[\\s\\S]{1,${characterBreakpointValue}}(\\s|$)`, 'g');
+    formattedLabel = formattedLabel.match(breakpointRegex) || [];
+
+    return formattedLabel || value;
+  }
+
+  /**
+   * Sets canvas height for horizontal bar charts
+   */
+  protected setCanvasContainerHeight() {
+    const bufferSpace = 30;
+
+    const canvasContainerEl: HTMLElement | null | undefined = this.chartWrapper?.querySelector(
+      this.chartCanvasContainerSelector
+    );
+
+    if (!canvasContainerEl) {
+      return;
+    }
+
+    canvasContainerEl.style.minHeight = `${this.chartLabels.length * (this.maxBarThickness + bufferSpace)}px`;
   }
 }
 

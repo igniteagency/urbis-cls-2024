@@ -202,33 +202,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
     // get color in rotation from colorsList based on index
     return this.colorsList[index % this.colorsList.length];
   }
-
-  protected getYTicks(value: string | number, scale: Scale<CoreScaleOptions>): string | Array<string> {
-    const chartWidth: number = scale.chart.width;
-    const label = scale.getLabelForValue(Number(value));
-
-    if (!chartWidth) return label;
-
-    const characterBreakpointValue: number = Math.round((chartWidth * (30 / 100)) / 6);
-    let formattedLabel: string | Array<string> = label;
-
-    // Break label into chunks for word wrap
-    const breakpointRegex = new RegExp(`[\\s\\S]{1,${characterBreakpointValue}}(\\s|$)`, 'g');
-    formattedLabel = formattedLabel.match(breakpointRegex) || [];
-
-    return formattedLabel || value;
-  }
-
-  private setCanvasContainerHeight() {
-    const bufferSpace = 30;
-    const canvasContainerEl: HTMLElement | null | undefined = 
-      this.chartWrapper?.querySelector(this.chartCanvasContainerSelector);
-
-    if (!canvasContainerEl) return;
-
-    canvasContainerEl.style.minHeight = 
-      `${this.chartLabels.length * (this.maxBarThickness + bufferSpace)}px`;
-  }
 }
 
 export default HorizontalStackedBarChart;
