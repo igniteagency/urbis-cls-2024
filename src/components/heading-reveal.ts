@@ -19,10 +19,10 @@ export function headingReveal() {
     });
 
     // Set each line to start at yPercent 110 (below the view)
-    gsap.set(heading.querySelectorAll('.line'), { yPercent: 110 });
+    window.gsap.set(heading.querySelectorAll('.line'), { yPercent: 110 });
 
     // ScrollTrigger animation to move lines into view
-    gsap.to(heading.querySelectorAll('.line'), {
+    window.gsap.to(heading.querySelectorAll('.line'), {
       yPercent: 0, // Move lines to their original position
       duration: 1, // Duration of the animation
       ease: 'power4.out', // Smooth easing for entry
