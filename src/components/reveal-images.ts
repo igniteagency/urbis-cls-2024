@@ -4,10 +4,10 @@ export function revealImages() {
 
   images.forEach((img) => {
     // Set initial clip-path with GSAP to ensure it's recognized
-    gsap.set(img, { clipPath: 'inset(0 100% 0 0)' });
+    window.gsap.set(img, { clipPath: 'inset(0 100% 0 0)' });
 
     // Create ScrollTrigger animation
-    gsap.to(img, {
+    window.gsap.to(img, {
       clipPath: 'inset(0 0% 0 0)', // Fully reveal the image
       duration: 1.5, // Adjust duration for visual effect
       ease: 'power4.out', // Smooth easing function
