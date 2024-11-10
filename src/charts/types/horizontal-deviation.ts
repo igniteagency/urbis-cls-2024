@@ -63,7 +63,7 @@ class HorizontalDeviationChart extends BarChart {
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / this.horizontalChartWidthDivider;
+              scale.width = scale.chart.width / this.horizontalChartWidthQuotient;
             },
           },
         },
@@ -90,11 +90,7 @@ class HorizontalDeviationChart extends BarChart {
             labels: this.getLabelObject(),
             anchor: () => (this.isStacked ? 'center' : 'end'),
             align: () => (this.isStacked ? 'center' : 'start'),
-            color: (context) => {
-              const val = context.dataset.data[context.dataIndex];
-              if (!val) return this.textDarkColor;
-              return this.textLightColor;
-            },
+            color: () => this.getDatalabelColor(),
           },
         },
       },

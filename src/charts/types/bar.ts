@@ -18,7 +18,7 @@ class BarChart extends UrbisSurveyChart {
   /**
    * Minimum color lighten percentage from the base color
    */
-  chartColorLightenMinPercent: number;
+  barColorLightenMinPercent: number;
 
   /**
    * Defines whether the bar chart is stacked or not
@@ -44,7 +44,7 @@ class BarChart extends UrbisSurveyChart {
 
     this.populateChartValuesList();
 
-    this.chartColorLightenMinPercent = Number(this.chartWrapper?.getAttribute('data-chart-color-min-lighten')) || 30;
+    this.barColorLightenMinPercent = Number(this.chartWrapper?.getAttribute('data-chart-color-min-lighten')) || 30;
 
     this.isStacked = 'true' === chartWrapper.getAttribute('data-bar-stacked') || false;
 
@@ -107,7 +107,7 @@ class BarChart extends UrbisSurveyChart {
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / this.horizontalChartWidthDivider;
+              scale.width = scale.chart.width / this.horizontalChartWidthQuotient;
             },
           },
         },
@@ -142,7 +142,7 @@ class BarChart extends UrbisSurveyChart {
             labels: this.getLabelObject(),
             anchor: () => (this.isStacked ? 'center' : 'end'),
             align: () => (this.isStacked ? 'center' : 'start'),
-            color: this.textLightColor,
+            color: () => this.getDatalabelColor()
           },
         },
       },
@@ -184,7 +184,7 @@ class BarChart extends UrbisSurveyChart {
       dataset.push({
         label: this.legends[i],
         data: this.chartValuesList[i],
-        backgroundColor: this.getBackgroundColor(i),
+        backgroundColor: this.getBackgroundColorShades(i, this.legends.length),
         barThickness: 'flex',
         barPercentage: 1,
         borderWidth: 0,
@@ -192,21 +192,6 @@ class BarChart extends UrbisSurveyChart {
     }
 
     return dataset;
-  }
-
-  /**
-   * Returns the color for the chart bar
-   *
-   * @param num The order number of legend item; starts from 0
-   * @returns Default or lightened color value
-   */
-  protected getBackgroundColor(num: number): string {
-    const color: string = this.activeToggle === 1 ? this.chartColor : window.colors.chart2022Dark;
-
-    // the percent by which this chart chunk will lighten
-    const lightenValue: number = (100 - this.chartColorLightenMinPercent) / this.legends.length || 0;
-
-    return 0 === num ? color : lighten(color, lightenValue * num);
   }
 }
 

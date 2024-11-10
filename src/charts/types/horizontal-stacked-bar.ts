@@ -14,8 +14,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
    */
   chartValuesList: Array<Array<number>> = [];
 
-  colorsList: Array<string> = [];
-
   /**
    * Whether the bar has any legends defined
    */
@@ -34,13 +32,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
     }
 
     this.populateChartValuesList();
-    
-    this.colorsList = [
-      getCSSVar( '--color--elements--background-alternate-1'),
-      getCSSVar('--color--elements--background-alternate-2'),
-      getCSSVar('--color--elements--background-alternate-3'),
-      getCSSVar('--color--elements--background-secondary'),
-    ]
 
     this.setCanvasContainerHeight();
   }
@@ -124,9 +115,7 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
             labels: this.getLabelObject(),
             anchor: 'center',
             align: 'center',
-            color: (context) => {
-              return context.datasetIndex < 3 ? this.textDarkColor : this.textLightColor
-            },
+            color: () => this.getDatalabelColor()
           },
         },
       },
@@ -172,7 +161,7 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
       dataset.push({
         label: this.legends[i],
         data: this.chartValuesList[i],
-        backgroundColor: this.getBackgroundColor(i),
+        backgroundColor: this.getBackgroundColorShades(i, this.legends.length),
         barThickness: 'flex',
         barPercentage: 0.9,
         categoryPercentage: 0.8,
@@ -189,11 +178,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
   private getChartTitle(): string {
     const titleEl = this.currentDataset?.querySelector(this.chartTitleSelector) as HTMLElement | null;
     return titleEl ? titleEl.innerText.trim() : '';
-  }
-
-  protected getBackgroundColor(index: number): string {
-    // get color in rotation from colorsList based on index
-    return this.colorsList[index % this.colorsList.length];
   }
 }
 

@@ -4,6 +4,7 @@ import type { _DeepPartialObject } from 'chart.js/dist/types/utils';
 import type { LabelOptions } from 'chartjs-plugin-datalabels/types/options';
 
 import type { ColorThemes } from '$types/global';
+import { lighten } from '$utils/colorLighten';
 
 export type legendPosition = 'top' | 'left' | 'bottom' | 'right';
 export type legendAlignment = 'start' | 'center' | 'end';
@@ -34,6 +35,12 @@ abstract class UrbisSurveyChart {
    * Can be overwritten with the attribute `data-chart-color` on the `chartWrapper` element
    */
   chartColor: string;
+
+  /**
+   * Minimum color lighten percentage from the base color
+   * Can be overwritten with the attribute `data-bar-color-min-lighten` on the `chartWrapper` element
+   */
+  barColorLightenMinPercent: number;
 
   /**
    * Maximum bar thickness
@@ -101,6 +108,9 @@ abstract class UrbisSurveyChart {
 
     this.hasChartDataToggle =
       chartWrapper.querySelectorAll(this.chartDataToggleSelector).length > 0;
+
+    this.barColorLightenMinPercent =
+      Number(this.chartWrapper?.getAttribute('data-bar-color-min-lighten')) || 30;
 
     if (!this.currentDataset) {
       console.error('No dataset wrapper element found for chart - ', { chartWrapper });
@@ -205,6 +215,7 @@ abstract class UrbisSurveyChart {
   }
 
   protected onThemeChange(currentTheme: ColorThemes) {
+    console.log('urbis survey charge theme change', { currentTheme });
     if (currentTheme === 'dark') {
       this.textDarkColor = window.colors.lightTextStatic;
       this.textLightColor = window.colors.darkTextStatic;
@@ -278,6 +289,25 @@ abstract class UrbisSurveyChart {
       return false;
     }
     return true;
+  }
+
+  protected getDatalabelColor() {
+    return this.activeToggle === 1 ? window.colors.lightTextStatic : window.colors.darkTextStatic;
+  }
+
+  /**
+   * Returns the color for the chart bar
+   *
+   * @param num The order number of legend item; starts from 0
+   * @returns Default or lightened color value
+   */
+  protected getBackgroundColorShades(num: number, legends: number): string {
+    const color: string = this.activeToggle === 1 ? this.chartColor : window.colors.chart2022Dark;
+
+    // the percent by which this chart chunk will lighten
+    const lightenValue: number = (100 - this.barColorLightenMinPercent) / legends || 0;
+
+    return 0 === num ? color : lighten(color, lightenValue * num);
   }
 }
 

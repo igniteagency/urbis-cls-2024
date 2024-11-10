@@ -26,8 +26,6 @@ class ChartJSInit {
     document.addEventListener('themeChange', (ev) => {
       this.onThemeChange((ev as CustomEvent).detail);
     });
-
-    // this.appendScriptsAndInit();
   }
 
   public init() {
@@ -147,6 +145,9 @@ class ChartJSInit {
     });
   }
 
+  /**
+   * Only sets the value. Chart updates from the `UrbisSurveyChart` base class
+   */
   private onThemeChange(currentTheme: ColorThemes) {
     if (currentTheme === 'dark') {
       this.colorPrimaryText = window.colors.lightTextStatic;
