@@ -37,8 +37,6 @@ export function IntroAnimation() {
   // Scroll event to trigger `.menu_wrapper` animation
   let menuShown = false;
   const showMenuOnScroll = () => {
-    console.log('Scroll Y position:', window.scrollY);
-
     if (!menuShown && window.scrollY > 5) {
       menuShown = true;
 
