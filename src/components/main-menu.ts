@@ -8,17 +8,23 @@ class MainMenu {
   ANIMATION_PROGRESS_CLASSNAME = 'is-animating';
 
   accordionEl: HTMLDetailsElement;
+  menuWrapper: HTMLDetailsElement | null;
+  menuBackdrop: HTMLElement | null;
 
   constructor() {
     this.accordionEl = document.querySelector<HTMLDetailsElement>(
       this.ITEM_SELECTOR
     ) as HTMLDetailsElement;
 
+    this.menuWrapper = document.querySelector('.menu_wrapper') as HTMLDetailsElement | null;
+    this.menuBackdrop = document.querySelector('.menu_backdrop') as HTMLElement | null;
+
     if (!this.accordionEl) {
       return;
     }
 
     this.animateMenu();
+    this.addBackdropClickListener();
   }
 
   private animateMenu() {
@@ -95,6 +101,39 @@ class MainMenu {
       width: contentEl.scrollWidth,
       height: contentEl.scrollHeight + 5,
     };
+  }
+
+  private addBackdropClickListener() {
+    if (this.menuWrapper && this.menuBackdrop) {
+      const accordionContentEl = this.menuWrapper.querySelector(this.CONTENT_SELECTOR);
+
+      if (!accordionContentEl) {
+        console.error('Accordion content not found for the backdrop click');
+        return;
+      }
+
+      this.menuBackdrop?.addEventListener('click', () => {
+        if (this.menuWrapper?.hasAttribute('open')) {
+          const { height } = this.getMenuDimensions(accordionContentEl);
+
+          accordionContentEl.classList.add(this.ANIMATION_PROGRESS_CLASSNAME);
+
+          const animation = accordionContentEl.animate(
+            [{ height: `${height}px` }, { height: '0px' }],
+            {
+              duration: this.ANIMATION_DURATION_IN_MS,
+              fill: 'forwards',
+            }
+          );
+
+          animation.onfinish = () => {
+            this.menuWrapper?.removeAttribute('open');
+            accordionContentEl.style.height = '';
+            accordionContentEl.classList.remove(this.ANIMATION_PROGRESS_CLASSNAME);
+          };
+        }
+      });
+    }
   }
 }
 
