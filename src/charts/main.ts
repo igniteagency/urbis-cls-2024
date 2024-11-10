@@ -21,11 +21,14 @@ class ChartJSInit {
     this.chartEls = [];
     this.charts = document.querySelectorAll('.chart_chart');
 
-    this.init();
-
     document.addEventListener('themeChange', (ev) => {
       this.onThemeChange((ev as CustomEvent).detail);
     });
+
+    // init color theme trigger
+    this.onThemeChange(window.currentTheme);
+
+    this.init();
   }
 
   public init() {

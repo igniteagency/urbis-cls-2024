@@ -124,6 +124,9 @@ abstract class UrbisSurveyChart {
     document.addEventListener('themeChange', (ev) => {
       this.onThemeChange((ev as CustomEvent).detail);
     });
+
+    // init color theme trigger
+    this.onThemeChange(window.currentTheme);
   }
 
   protected setChartDataToggleListener() {
@@ -215,7 +218,6 @@ abstract class UrbisSurveyChart {
   }
 
   protected onThemeChange(currentTheme: ColorThemes) {
-    console.log('urbis survey charge theme change', { currentTheme });
     if (currentTheme === 'dark') {
       this.textDarkColor = window.colors.lightTextStatic;
       this.textLightColor = window.colors.darkTextStatic;
