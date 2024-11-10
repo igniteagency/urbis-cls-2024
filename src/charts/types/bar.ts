@@ -2,7 +2,7 @@ import Chart from 'chart.js/auto';
 import type { ChartDataset, CoreScaleOptions, Scale } from 'chart.js/auto';
 
 import { lighten } from '$utils/colorLighten';
-import UrbisSurveyChart, { type legendPosition, type legendAlignment } from '$charts/class/urbis-survey-chart';
+import UrbisSurveyChart, { type legendPosition, type legendAlignment } from '$charts/base/urbis-survey-chart';
 
 class BarChart extends UrbisSurveyChart {
   /**
@@ -18,7 +18,7 @@ class BarChart extends UrbisSurveyChart {
   /**
    * Minimum color lighten percentage from the base color
    */
-  chartColorLightenMinPercent: number;
+  barColorLightenMinPercent: number;
 
   /**
    * Defines whether the bar chart is stacked or not
@@ -44,7 +44,7 @@ class BarChart extends UrbisSurveyChart {
 
     this.populateChartValuesList();
 
-    this.chartColorLightenMinPercent = Number(this.chartWrapper?.getAttribute('data-chart-color-min-lighten')) || 30;
+    this.barColorLightenMinPercent = Number(this.chartWrapper?.getAttribute('data-chart-color-min-lighten')) || 30;
 
     this.isStacked = 'true' === chartWrapper.getAttribute('data-bar-stacked') || false;
 
@@ -107,7 +107,7 @@ class BarChart extends UrbisSurveyChart {
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / 2.5; // 25% of chart's width
+              scale.width = scale.chart.width / this.horizontalChartWidthQuotient;
             },
           },
         },
@@ -132,9 +132,9 @@ class BarChart extends UrbisSurveyChart {
           },
           datalabels: {
             display: (context) => {
-              // don't display labels for a value of 0
-              const { dataIndex } = context;
-              return 0 !== context.dataset.data[dataIndex] ? true : false;
+              // don't display labels for a values less than 5
+              const value = context.dataset.data[context.dataIndex];
+              return this.shouldDisplayDatalabel(value as number);
             },
             formatter: (value) => {
               return `${value}%`;
@@ -142,9 +142,7 @@ class BarChart extends UrbisSurveyChart {
             labels: this.getLabelObject(),
             anchor: () => (this.isStacked ? 'center' : 'end'),
             align: () => (this.isStacked ? 'center' : 'start'),
-            color: (context) => {
-              return context.dataset.data[context.dataIndex] > 5 ? this.textLightColor : this.textDarkColor
-            },
+            color: () => this.getDatalabelColor()
           },
         },
       },
@@ -186,7 +184,7 @@ class BarChart extends UrbisSurveyChart {
       dataset.push({
         label: this.legends[i],
         data: this.chartValuesList[i],
-        backgroundColor: this.getBackgroundColor(i),
+        backgroundColor: this.getBackgroundColorShades(i, this.legends.length),
         barThickness: 'flex',
         barPercentage: 1,
         borderWidth: 0,
@@ -194,52 +192,6 @@ class BarChart extends UrbisSurveyChart {
     }
 
     return dataset;
-  }
-
-  /**
-   * Returns the color for the chart bar
-   *
-   * @param num The order number of legend item; starts from 0
-   * @returns Default or lightened color value
-   */
-  protected getBackgroundColor(num: number): string {
-    const color: string = this.activeToggle === 1 ? this.chartColor : window.colors.chart2022Dark;
-
-    // the percent by which this chart chunk will lighten
-    const lightenValue: number = (100 - this.chartColorLightenMinPercent) / this.legends.length || 0;
-
-    return 0 === num ? color : lighten(color, lightenValue * num);
-  }
-
-  protected getYTicks(value: string | number, scale: Scale<CoreScaleOptions>): string | Array<string> {
-    const chartWidth: number = scale.chart.width;
-    const label = scale.getLabelForValue(Number(value));
-
-    if (!chartWidth) return label;
-
-    const characterBreakpointValue: number = Math.round((chartWidth * (30 / 100)) / 6);
-
-    let formattedLabel: string | Array<string> = label;
-
-    // break label into chunks of defined breakpoints characters to enable word wrap
-    const breakpointRegex = new RegExp(`[\\s\\S]{1,${characterBreakpointValue}}(\\s|$)`, 'g');
-    formattedLabel = formattedLabel.match(breakpointRegex) || [];
-
-    return formattedLabel || value;
-  }
-
-  private setCanvasContainerHeight() {
-    const bufferSpace = 30;
-
-    const canvasContainerEl: HTMLElement | null | undefined = this.chartWrapper?.querySelector(
-      this.chartCanvasContainerSelector
-    );
-
-    if (!canvasContainerEl) {
-      return;
-    }
-
-    canvasContainerEl.style.minHeight = `${this.chartLabels.length * (this.maxBarThickness + bufferSpace)}px`;
   }
 }
 

@@ -1,0 +1,1 @@
+"use strict";(()=>{function o(){document.querySelectorAll(".reveal-image").forEach(e=>{gsap.set(e,{clipPath:"inset(0 100% 0 0)"}),gsap.to(e,{clipPath:"inset(0 0% 0 0)",duration:1.5,ease:"power4.out",scrollTrigger:{trigger:e,start:"top 80%",toggleActions:"play none none none"}})})}})();

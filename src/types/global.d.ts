@@ -33,6 +33,7 @@ declare global {
     loadExternalScript(url: string, placement: 'head' | 'body' = 'body', defer: boolean = true): void;
 
     colors: UrbisColors;
+    currentTheme: ColorThemes;
   }
 
   // Extend `querySelector` and `querySelectorAll` function to stop the nagging of converting `Element` to `HTMLElement` all the time

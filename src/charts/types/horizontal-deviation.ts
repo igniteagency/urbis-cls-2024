@@ -1,7 +1,7 @@
 import Chart from 'chart.js/auto';
 import type { ChartDataset, ScriptableContext } from 'chart.js/auto';
 
-import BarChart from '$charts/bar';
+import BarChart from '$charts/types/bar';
 import { lighten } from '$utils/colorLighten';
 
 class HorizontalDeviationChart extends BarChart {
@@ -63,7 +63,7 @@ class HorizontalDeviationChart extends BarChart {
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / 3; // 33% of chart's width
+              scale.width = scale.chart.width / this.horizontalChartWidthQuotient;
             },
           },
         },
@@ -80,9 +80,9 @@ class HorizontalDeviationChart extends BarChart {
           },
           datalabels: {
             display: (context) => {
-              // don't display labels for a value of 0
-              const { dataIndex } = context;
-              return 0 !== context.dataset.data[dataIndex] ? true : false;
+              // don't display labels for a values smaller than 5
+              const value = context.dataset.data[context.dataIndex];
+              return this.shouldDisplayDatalabel(value as number);
             },
             formatter: (value) => {
               return `${value}%`;
@@ -90,11 +90,7 @@ class HorizontalDeviationChart extends BarChart {
             labels: this.getLabelObject(),
             anchor: () => (this.isStacked ? 'center' : 'end'),
             align: () => (this.isStacked ? 'center' : 'start'),
-            color: (context) => {
-              const val = context.dataset.data[context.dataIndex];
-              if (!val) return this.textDarkColor;
-              return val > 5 || val < -5 ? this.textLightColor : this.textDarkColor;
-            },
+            color: () => this.getDatalabelColor(),
           },
         },
       },

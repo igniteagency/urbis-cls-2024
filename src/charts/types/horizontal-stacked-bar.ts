@@ -1,6 +1,6 @@
 import Chart from 'chart.js/auto';
-import type { ChartDataset, CoreScaleOptions, Scale } from 'chart.js/auto';
-import UrbisSurveyChart, { type legendPosition, type legendAlignment } from '$charts/class/urbis-survey-chart';
+import type { ChartDataset } from 'chart.js/auto';
+import UrbisSurveyChart, { type legendPosition, type legendAlignment } from '$charts/base/urbis-survey-chart';
 import { getCSSVar } from '$utils/getCSSVar';
 
 class HorizontalStackedBarChart extends UrbisSurveyChart {
@@ -13,8 +13,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
    * A list of chart values for each stack segment
    */
   chartValuesList: Array<Array<number>> = [];
-
-  colorsList: Array<string> = [];
 
   /**
    * Whether the bar has any legends defined
@@ -34,13 +32,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
     }
 
     this.populateChartValuesList();
-    
-    this.colorsList = [
-      getCSSVar( '--color--elements--background-alternate-1'),
-      getCSSVar('--color--elements--background-alternate-2'),
-      getCSSVar('--color--elements--background-alternate-3'),
-      getCSSVar('--color--elements--background-secondary'),
-    ]
 
     this.setCanvasContainerHeight();
   }
@@ -70,7 +61,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
             stacked: true,
             ticks: {
               display: false,
-              callback: (value) => `${value}%`,
             },
             grid: {
               display: false,
@@ -91,7 +81,7 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / 2.5;
+              scale.width = scale.chart.width / this.horizontalChartWidthQuotient;
             },
           },
         },
@@ -118,16 +108,14 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
           },
           datalabels: {
             display: (context) => {
-              const { dataIndex } = context;
-              return 0 !== context.dataset.data[dataIndex];
+              const value = context.dataset.data[context.dataIndex];
+              return this.shouldDisplayDatalabel(value as number);
             },
             formatter: (value) => `${value}%`,
             labels: this.getLabelObject(),
             anchor: 'center',
             align: 'center',
-            color: (context) => {
-              return context.datasetIndex < 3 ? this.textDarkColor : this.textLightColor
-            },
+            color: () => this.getDatalabelColor()
           },
         },
       },
@@ -173,7 +161,7 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
       dataset.push({
         label: this.legends[i],
         data: this.chartValuesList[i],
-        backgroundColor: this.getBackgroundColor(i),
+        backgroundColor: this.getBackgroundColorShades(i, this.legends.length),
         barThickness: 'flex',
         barPercentage: 0.9,
         categoryPercentage: 0.8,
@@ -190,38 +178,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
   private getChartTitle(): string {
     const titleEl = this.currentDataset?.querySelector(this.chartTitleSelector) as HTMLElement | null;
     return titleEl ? titleEl.innerText.trim() : '';
-  }
-
-  protected getBackgroundColor(index: number): string {
-    // get color in rotation from colorsList based on index
-    return this.colorsList[index % this.colorsList.length];
-  }
-
-  protected getYTicks(value: string | number, scale: Scale<CoreScaleOptions>): string | Array<string> {
-    const chartWidth: number = scale.chart.width;
-    const label = scale.getLabelForValue(Number(value));
-
-    if (!chartWidth) return label;
-
-    const characterBreakpointValue: number = Math.round((chartWidth * (30 / 100)) / 6);
-    let formattedLabel: string | Array<string> = label;
-
-    // Break label into chunks for word wrap
-    const breakpointRegex = new RegExp(`[\\s\\S]{1,${characterBreakpointValue}}(\\s|$)`, 'g');
-    formattedLabel = formattedLabel.match(breakpointRegex) || [];
-
-    return formattedLabel || value;
-  }
-
-  private setCanvasContainerHeight() {
-    const bufferSpace = 30;
-    const canvasContainerEl: HTMLElement | null | undefined = 
-      this.chartWrapper?.querySelector(this.chartCanvasContainerSelector);
-
-    if (!canvasContainerEl) return;
-
-    canvasContainerEl.style.minHeight = 
-      `${this.chartLabels.length * (this.maxBarThickness + bufferSpace)}px`;
   }
 }
 

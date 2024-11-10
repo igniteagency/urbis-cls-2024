@@ -1,8 +1,10 @@
 import type Chart from 'chart.js/auto';
+import type { CoreScaleOptions, Scale } from 'chart.js/auto';
 import type { _DeepPartialObject } from 'chart.js/dist/types/utils';
 import type { LabelOptions } from 'chartjs-plugin-datalabels/types/options';
 
 import type { ColorThemes } from '$types/global';
+import { lighten } from '$utils/colorLighten';
 
 export type legendPosition = 'top' | 'left' | 'bottom' | 'right';
 export type legendAlignment = 'start' | 'center' | 'end';
@@ -35,6 +37,12 @@ abstract class UrbisSurveyChart {
   chartColor: string;
 
   /**
+   * Minimum color lighten percentage from the base color
+   * Can be overwritten with the attribute `data-bar-color-min-lighten` on the `chartWrapper` element
+   */
+  barColorLightenMinPercent: number;
+
+  /**
    * Maximum bar thickness
    */
   maxBarThickness = 50;
@@ -56,6 +64,8 @@ abstract class UrbisSurveyChart {
   chartDatasetWrapperSelector = '.chart_dataset-wrapper';
   chartDataToggleSelector = '.chart_data-toggle';
 
+  TOGGLE_ACTIVE_CLASSNAME = 'is-active';
+
   /**
    * Dynamic chart colors that invert as per theme
    */
@@ -65,6 +75,11 @@ abstract class UrbisSurveyChart {
   chartLabelsList: NodeListOf<HTMLElement>;
 
   activeToggle: number = 1;
+
+  /**
+   * 25% of chart's width
+   */
+  horizontalChartWidthQuotient = 2.5;
 
   /**
    * triggers on chart toggle switch
@@ -96,6 +111,9 @@ abstract class UrbisSurveyChart {
     this.hasChartDataToggle =
       chartWrapper.querySelectorAll(this.chartDataToggleSelector).length > 0;
 
+    this.barColorLightenMinPercent =
+      Number(this.chartWrapper?.getAttribute('data-bar-color-min-lighten')) || 30;
+
     if (!this.currentDataset) {
       console.error('No dataset wrapper element found for chart - ', { chartWrapper });
       return;
@@ -108,6 +126,9 @@ abstract class UrbisSurveyChart {
     document.addEventListener('themeChange', (ev) => {
       this.onThemeChange((ev as CustomEvent).detail);
     });
+
+    // init color theme trigger
+    this.onThemeChange(window.currentTheme);
   }
 
   protected setChartDataToggleListener() {
@@ -164,10 +185,10 @@ abstract class UrbisSurveyChart {
 
     // remove active class from the previous toggle
     this.chartWrapper
-      ?.querySelector(`${this.chartDataToggleSelector}.is-active`)
-      ?.classList.remove('is-active');
+      ?.querySelector(`${this.chartDataToggleSelector}.${this.TOGGLE_ACTIVE_CLASSNAME}`)
+      ?.classList.remove(this.TOGGLE_ACTIVE_CLASSNAME);
 
-    targetEl?.classList.add('is-active'); // add active class to the current toggle
+    targetEl?.classList.add(this.TOGGLE_ACTIVE_CLASSNAME); // add active class to the current toggle
   }
 
   protected extractDataAsString(el: HTMLElement | null) {
@@ -220,6 +241,77 @@ abstract class UrbisSurveyChart {
 
     // console.log('chart update on theme change', { currentTheme });
     this.chartInstance?.update();
+  }
+
+  /**
+   * Responsive text wrapping on the Y axis
+   */
+  protected getYTicks(
+    value: string | number,
+    scale: Scale<CoreScaleOptions>
+  ): string | Array<string> {
+    const chartWidth: number = scale.chart.width;
+    const label = scale.getLabelForValue(Number(value));
+
+    if (!chartWidth) return label;
+
+    const characterBreakpointValue: number = Math.round((chartWidth * (30 / 100)) / 6);
+
+    let formattedLabel: string | Array<string> = label;
+
+    // break label into chunks of defined breakpoints characters to enable word wrap
+    const breakpointRegex = new RegExp(`[\\s\\S]{1,${characterBreakpointValue}}(\\s|$)`, 'g');
+    formattedLabel = formattedLabel.match(breakpointRegex) || [];
+
+    return formattedLabel || value;
+  }
+
+  /**
+   * Sets canvas height for horizontal bar charts
+   */
+  protected setCanvasContainerHeight() {
+    const bufferSpace = 30;
+
+    const canvasContainerEl: HTMLElement | null | undefined = this.chartWrapper?.querySelector(
+      this.chartCanvasContainerSelector
+    );
+
+    if (!canvasContainerEl) {
+      return;
+    }
+
+    canvasContainerEl.style.minHeight = `${this.chartLabels.length * (this.maxBarThickness + bufferSpace)}px`;
+  }
+
+  /**
+   * Whether to show the datalabel value on the bar or not
+   * Hides datalabels if the value is between -5 and 5
+   * @param value datalabel value
+   */
+  protected shouldDisplayDatalabel(value: number) {
+    if (value <= 5 && value >= -5) {
+      return false;
+    }
+    return true;
+  }
+
+  protected getDatalabelColor() {
+    return this.activeToggle === 1 ? window.colors.lightTextStatic : window.colors.darkTextStatic;
+  }
+
+  /**
+   * Returns the color for the chart bar
+   *
+   * @param num The order number of legend item; starts from 0
+   * @returns Default or lightened color value
+   */
+  protected getBackgroundColorShades(num: number, legends: number): string {
+    const color: string = this.activeToggle === 1 ? this.chartColor : window.colors.chart2022Dark;
+
+    // the percent by which this chart chunk will lighten
+    const lightenValue: number = (100 - this.barColorLightenMinPercent) / legends || 0;
+
+    return 0 === num ? color : lighten(color, lightenValue * num);
   }
 }
 

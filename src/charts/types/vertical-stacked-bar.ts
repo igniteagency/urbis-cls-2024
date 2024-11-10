@@ -2,8 +2,7 @@ import Chart from 'chart.js/auto';
 import type { ChartDataset, ChartTypeRegistry, TooltipItem } from 'chart.js/auto';
 import type { Context } from 'chartjs-plugin-datalabels';
 
-import { lighten } from '$utils/colorLighten';
-import UrbisSurveyChart, { type legendAlignment, type legendPosition } from '$charts/class/urbis-survey-chart';
+import UrbisSurveyChart, { type legendAlignment, type legendPosition } from '$charts/base/urbis-survey-chart';
 
 class VerticalStackedBarChart extends UrbisSurveyChart {
   /**
@@ -30,11 +29,6 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
    * Array of Chart value HTML elements for each bar/legend
    */
   chartValuesList: Array<Array<number>> = [];
-
-  /**
-   * Minimum color lighten percentage from the base color
-   */
-  chartColorLightenMinPercent: number;
 
   /**
    * Index of the middle legend value (lying on the center of x-axis)
@@ -66,8 +60,6 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
     this.midLegendIndex = chartWrapper.getAttribute('data-mid-legend-index')
       ? Number(chartWrapper.getAttribute('data-mid-legend-index')) - 1
       : 1;
-
-    this.chartColorLightenMinPercent = Number(this.chartWrapper?.getAttribute('data-chart-color-min-lighten')) || 30;
 
     if (!this.chartLabels.length) {
       console.error('No chart label element found. Need one to render the chart');
@@ -146,7 +138,7 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
             text: this.chartTitle,
             display: '' !== this.chartTitle ? true : false,
             font: {
-              weight: '600',
+              weight: 600,
             },
           },
           tooltip: {
@@ -161,13 +153,12 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
               return this.getBarValueLabel(context);
             },
             display: (context) => {
-              // don't display labels for a value of 0x
-              return this.getBarLegendValue(context) ? true : false;
+              // don't display labels for a value of 0
+              const value = this.getBarLegendValue(context)
+              return this.shouldDisplayDatalabel(value);
             },
             labels: this.getLabelObject(),
-            color: (context) => {
-              return context.datasetIndex == 0 ? this.textDarkColor : this.textLightColor;
-            }
+            color: () => this.getDatalabelColor()
           },
         },
       },
@@ -204,7 +195,7 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
         data: this.chartValuesList[i],
         borderSkipped: true,
         order: this.legends.length - i,
-        backgroundColor: this.getBackgroundColor(i),
+        backgroundColor: this.getBackgroundColorShades(i, this.legends.length),
         borderWidth: 1,
       });
     }
@@ -291,7 +282,7 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
       ticks: {
         maxRotation: this.maxLabelRotation,
         font: {
-          weight: '500',
+          weight: 500,
         },
         callback: (value: string | number, index: number) => this.chartLabelLarge[index],
       },
@@ -330,21 +321,6 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
   private getChartTitle(): string {
     const titleEl = this.currentDataset?.querySelector(this.chartTitleSelector) as HTMLElement | null;
     return titleEl ? titleEl.innerText.trim() : '';
-  }
-
-  /**
-   * Returns the color for the chart bar
-   *
-   * @param num The order number of legend item; starts from 0
-   * @returns Default or lightened color value
-   */
-  private getBackgroundColor(num: number): string {
-    const color: string = this.activeToggle === 1 ? this.chartColor : window.colors.chart2022Dark;
-
-    // the percent by which this chart chunk will lighten
-    const lightenValue: number = (100 - this.chartColorLightenMinPercent) / this.legends.length || 0;
-
-    return 0 === num ? color : lighten(color, lightenValue * num);
   }
 }
 
