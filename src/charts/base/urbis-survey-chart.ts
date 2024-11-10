@@ -64,6 +64,8 @@ abstract class UrbisSurveyChart {
   chartDatasetWrapperSelector = '.chart_dataset-wrapper';
   chartDataToggleSelector = '.chart_data-toggle';
 
+  TOGGLE_ACTIVE_CLASSNAME = 'is-active';
+
   /**
    * Dynamic chart colors that invert as per theme
    */
@@ -183,10 +185,10 @@ abstract class UrbisSurveyChart {
 
     // remove active class from the previous toggle
     this.chartWrapper
-      ?.querySelector(`${this.chartDataToggleSelector}.is-active`)
-      ?.classList.remove('is-active');
+      ?.querySelector(`${this.chartDataToggleSelector}.${this.TOGGLE_ACTIVE_CLASSNAME}`)
+      ?.classList.remove(this.TOGGLE_ACTIVE_CLASSNAME);
 
-    targetEl?.classList.add('is-active'); // add active class to the current toggle
+    targetEl?.classList.add(this.TOGGLE_ACTIVE_CLASSNAME); // add active class to the current toggle
   }
 
   protected extractDataAsString(el: HTMLElement | null) {
