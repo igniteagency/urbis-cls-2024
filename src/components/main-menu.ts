@@ -5,6 +5,8 @@ class MainMenu {
 
   ANIMATION_DURATION_IN_MS = 300;
 
+  ANIMATION_PROGRESS_CLASSNAME = 'is-animating';
+
   accordionEl: HTMLDetailsElement;
 
   constructor() {
@@ -37,11 +39,16 @@ class MainMenu {
         const { width, height } = this.getMenuDimensions(accordionContentEl);
         // const height = accordionContentEl.scrollHeight;
         accordionContentEl.style.height = '0px';
-        accordionContentEl.style.width = '0px';
+        // accordionContentEl.style.width = '0px';
+
+        accordionContentEl.classList.add(this.ANIMATION_PROGRESS_CLASSNAME);
+
         accordionContentEl.animate(
           [
-            { height: '0px', width: '0px' },
-            { height: `${height}px`, width: `${width}px` },
+            // { height: '0px', width: '0px' },
+            { height: '0px' },
+            // { height: `${height}px`, width: `${width}px` },
+            { height: `${height}px` },
           ],
           {
             duration: this.ANIMATION_DURATION_IN_MS,
@@ -49,15 +56,22 @@ class MainMenu {
           }
         ).onfinish = () => {
           accordionContentEl.style.height = 'auto';
-          accordionContentEl.style.width = '100%';
+          // accordionContentEl.style.width = '100%';
+
+          accordionContentEl.classList.remove(this.ANIMATION_PROGRESS_CLASSNAME);
         };
       } else {
         const { width, height } = this.getMenuDimensions(accordionContentEl);
         // const height = accordionContentEl.scrollHeight;
+
+        accordionContentEl.classList.add(this.ANIMATION_PROGRESS_CLASSNAME);
+
         const animation = accordionContentEl.animate(
           [
-            { height: `${height}px`, width: `${width}px` },
-            { height: '0px', width: '0px' },
+            // { height: `${height}px`, width: `${width}px` },
+            { height: `${height}px` },
+            // { height: '0px', width: '0px' },
+            { height: '0px' },
           ],
           {
             duration: this.ANIMATION_DURATION_IN_MS,
@@ -68,17 +82,18 @@ class MainMenu {
         animation.onfinish = () => {
           this.accordionEl.open = false;
           accordionContentEl.style.height = '';
-          accordionContentEl.style.width = '';
+          // accordionContentEl.style.width = '';
+
+          accordionContentEl.classList.remove(this.ANIMATION_PROGRESS_CLASSNAME);
         };
       }
     });
   }
 
   private getMenuDimensions(contentEl: HTMLElement) {
-    console.log(contentEl.scrollWidth, contentEl.scrollHeight);
     return {
       width: contentEl.scrollWidth,
-      height: contentEl.scrollHeight,
+      height: contentEl.scrollHeight + 5,
     };
   }
 }
