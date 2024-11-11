@@ -26,11 +26,6 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
   chartLabelLarge: Array<string>;
 
   /**
-   * Array of Chart value HTML elements for each bar/legend
-   */
-  chartValuesList: Array<Array<number>> = [];
-
-  /**
    * Index of the middle legend value (lying on the center of x-axis)
    */
   midLegendIndex: number;
@@ -167,25 +162,11 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
     return this.chartInstance;
   }
 
-  // Populates the chartValuesList for the current dataset
-  protected populateChartValuesList(): void {
-    const chartValuesElList: NodeListOf<HTMLElement> | undefined = this.currentDataset?.querySelectorAll(
-      this.chartValuesSelector
-    );
-
-    if (chartValuesElList?.length) {
-      this.chartValuesList = [];
-      for (const legendValuesEl of chartValuesElList) {
-        this.chartValuesList.push(this.extractDataAsNumber(legendValuesEl));
-      }
-    }
-  }
-
   /**
    * Generates and passes the dataset for the chart
    * @returns The dataset value for the chart
    */
-  private generateDataset(): Array<ChartDataset> {
+  protected generateDataset(): Array<ChartDataset> {
     const dataset: Array<ChartDataset> = [];
 
     for (let i = this.legends.length - 1; i >= 0; i--) {
@@ -201,24 +182,6 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
     }
 
     return dataset;
-  }
-
-  protected toggleChartData(): void {
-    if (!this.chartInstance) {
-      console.error('No chartInstance found', this.chartInstance, this.chartWrapper);
-      return;
-    }
-
-    const chartTitle = this.getChartTitle();
-
-    if (this.chartInstance.config.options?.plugins?.title?.text) {
-      this.chartInstance.config.options.plugins.title.text = chartTitle;
-    }
-
-    this.populateChartValuesList();
-    this.chartInstance.config.data.datasets = this.generateDataset();
-    this.chartInstance.config.data.labels = this.chartLabels;
-    this.chartInstance.update();
   }
 
   /**
@@ -315,13 +278,7 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
     };
   }
 
-  /**
-   * @returns The title of chart from the HTML
-   */
-  private getChartTitle(): string {
-    const titleEl = this.currentDataset?.querySelector(this.chartTitleSelector) as HTMLElement | null;
-    return titleEl ? titleEl.innerText.trim() : '';
-  }
+  
 }
 
 export default VerticalStackedBarChart;

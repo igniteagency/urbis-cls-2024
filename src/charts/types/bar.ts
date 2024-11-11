@@ -1,7 +1,6 @@
 import Chart from 'chart.js/auto';
-import type { ChartDataset, CoreScaleOptions, Scale } from 'chart.js/auto';
+import type { ChartDataset } from 'chart.js/auto';
 
-import { lighten } from '$utils/colorLighten';
 import UrbisSurveyChart, { type legendPosition, type legendAlignment } from '$charts/base/urbis-survey-chart';
 
 class BarChart extends UrbisSurveyChart {
@@ -9,11 +8,6 @@ class BarChart extends UrbisSurveyChart {
    * Legends for the current chart. Optional. Used for a grouped bar chart
    */
   legends: Array<string>;
-
-  /**
-   * A list of chart values, for each legend
-   */
-  chartValuesList: Array<Array<number>> = [];
 
   /**
    * Minimum color lighten percentage from the base color
@@ -149,32 +143,6 @@ class BarChart extends UrbisSurveyChart {
     });
 
     return this.chartInstance;
-  }
-
-  // Populates the chartValuesList for the current dataset
-  protected populateChartValuesList(): void {
-    const chartValuesElList: NodeListOf<HTMLElement> | undefined = this.currentDataset?.querySelectorAll(
-      this.chartValuesSelector
-    );
-
-    if (chartValuesElList?.length) {
-      this.chartValuesList = [];
-      for (const legendValuesEl of chartValuesElList) {
-        this.chartValuesList.push(this.extractDataAsNumber(legendValuesEl));
-      }
-    }
-  }
-
-  protected toggleChartData(): void {
-    if (!this.chartInstance) {
-      console.error('No chartInstance found', this.chartInstance, this.chartWrapper);
-      return;
-    }
-
-    this.populateChartValuesList();
-    this.chartInstance.config.data.datasets = this.generateDataset();
-    this.chartInstance.config.data.labels = this.chartLabels;
-    this.chartInstance.update();
   }
 
   protected generateDataset(): Array<ChartDataset> {

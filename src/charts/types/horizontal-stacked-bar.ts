@@ -1,18 +1,12 @@
 import Chart from 'chart.js/auto';
 import type { ChartDataset } from 'chart.js/auto';
 import UrbisSurveyChart, { type legendPosition, type legendAlignment } from '$charts/base/urbis-survey-chart';
-import { getCSSVar } from '$utils/getCSSVar';
 
 class HorizontalStackedBarChart extends UrbisSurveyChart {
   /**
    * Legends for the stacked bar segments
    */
   legends: Array<string>;
-
-  /**
-   * A list of chart values for each stack segment
-   */
-  chartValuesList: Array<Array<number>> = [];
 
   /**
    * Whether the bar has any legends defined
@@ -124,36 +118,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
     return this.chartInstance;
   }
 
-  protected populateChartValuesList(): void {
-    const chartValuesElList: NodeListOf<HTMLElement> | undefined = 
-      this.currentDataset?.querySelectorAll(this.chartValuesSelector);
-
-    if (chartValuesElList?.length) {
-      this.chartValuesList = [];
-      for (const legendValuesEl of chartValuesElList) {
-        this.chartValuesList.push(this.extractDataAsNumber(legendValuesEl));
-      }
-    }
-  }
-
-  protected toggleChartData(): void {
-    if (!this.chartInstance) {
-      console.error('No chartInstance found', this.chartInstance, this.chartWrapper);
-      return;
-    }
-
-    const chartTitle = this.getChartTitle();
-
-    if (this.chartInstance.config.options?.plugins?.title?.text) {
-      this.chartInstance.config.options.plugins.title.text = chartTitle;
-    }
-
-    this.populateChartValuesList();
-    this.chartInstance.config.data.datasets = this.generateDataset();
-    this.chartInstance.config.data.labels = this.chartLabels;
-    this.chartInstance.update();
-  }
-
   protected generateDataset(): Array<ChartDataset> {
     const dataset: Array<ChartDataset> = [];
 
@@ -170,14 +134,6 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
     }
 
     return dataset;
-  }
-
-  /**
-   * @returns The title of chart from the HTML
-   */
-  private getChartTitle(): string {
-    const titleEl = this.currentDataset?.querySelector(this.chartTitleSelector) as HTMLElement | null;
-    return titleEl ? titleEl.innerText.trim() : '';
   }
 }
 

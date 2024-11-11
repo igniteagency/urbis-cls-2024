@@ -1,5 +1,5 @@
 import type Chart from 'chart.js/auto';
-import type { CoreScaleOptions, Scale } from 'chart.js/auto';
+import type { ChartDataset, CoreScaleOptions, Scale } from 'chart.js/auto';
 import type { _DeepPartialObject } from 'chart.js/dist/types/utils';
 import type { LabelOptions } from 'chartjs-plugin-datalabels/types/options';
 
@@ -17,6 +17,11 @@ abstract class UrbisSurveyChart {
   chartInstance: Chart | null = null;
   hasChartDataToggle = false;
   currentDataset: HTMLElement | null;
+
+  /**
+   * A list of chart values for each stack segment
+   */
+  chartValuesList: Array<Array<number>> = [];
 
   /**
    * Default position of the legends for this chart.
@@ -81,11 +86,7 @@ abstract class UrbisSurveyChart {
    */
   horizontalChartWidthQuotient = 2.5;
 
-  /**
-   * triggers on chart toggle switch
-   * @param toggleInstance starting from 1
-   */
-  protected abstract toggleChartData(): void;
+  protected abstract generateDataset(): Array<ChartDataset>;
 
   constructor(chartWrapper: HTMLDivElement) {
     this.chartWrapper = chartWrapper;
@@ -281,6 +282,51 @@ abstract class UrbisSurveyChart {
     }
 
     canvasContainerEl.style.minHeight = `${this.chartLabels.length * (this.maxBarThickness + bufferSpace)}px`;
+  }
+
+  // Populates the chartValuesList for the current dataset
+  protected populateChartValuesList(): void {
+    const chartValuesElList: NodeListOf<HTMLElement> | undefined =
+      this.currentDataset?.querySelectorAll(this.chartValuesSelector);
+
+    if (chartValuesElList?.length) {
+      this.chartValuesList = [];
+      for (const legendValuesEl of chartValuesElList) {
+        this.chartValuesList.push(this.extractDataAsNumber(legendValuesEl));
+      }
+    }
+  }
+
+  /**
+   * triggers on chart toggle switch
+   * @param toggleInstance starting from 1
+   */
+  protected toggleChartData() {
+    if (!this.chartInstance) {
+      console.error('No chartInstance found', this.chartInstance, this.chartWrapper);
+      return;
+    }
+
+    const chartTitle = this.getChartTitle();
+
+    if (this.chartInstance.config.options?.plugins?.title?.text) {
+      this.chartInstance.config.options.plugins.title.text = chartTitle;
+    }
+
+    this.populateChartValuesList();
+    this.chartInstance.config.data.datasets = this.generateDataset();
+    this.chartInstance.config.data.labels = this.chartLabels;
+    this.chartInstance.update();
+  }
+
+  /**
+   * @returns The title of chart from the HTML
+   */
+  protected getChartTitle(): string {
+    const titleEl = this.currentDataset?.querySelector(
+      this.chartTitleSelector
+    ) as HTMLElement | null;
+    return titleEl ? titleEl.innerText.trim() : '';
   }
 
   /**
