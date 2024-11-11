@@ -3,31 +3,7 @@ class TableChart {
   TABLE_DATA_NUMBER_SELECTOR = '[data-el="table-data-number"]';
 
   constructor() {
-    this.setTableHeight();
     this.setCellValues();
-  }
-
-  /**
-   * Set table height, reacting to resize
-   */
-  private setTableHeight() {
-    const tableComponentsList = document.querySelectorAll(this.TABLE_COMPONENT_SELECTOR);
-    tableComponentsList.forEach((tableComponent) => {
-      const tableEl = tableComponent.querySelector('table');
-      if (!tableEl) {
-        return;
-      }
-
-      tableComponent.style.height = `${tableEl.offsetHeight}px`;
-
-      // use ResizeObserver
-      new ResizeObserver((entries) => {
-        entries.forEach((entry) => {
-          const { height } = entry.contentRect;
-          tableComponent.style.height = `${height}px`;
-        });
-      }).observe(tableEl);
-    });
   }
 
   /**
