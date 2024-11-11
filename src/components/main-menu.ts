@@ -106,33 +106,43 @@ class MainMenu {
   private addBackdropClickListener() {
     if (this.menuWrapper && this.menuBackdrop) {
       const accordionContentEl = this.menuWrapper.querySelector(this.CONTENT_SELECTOR);
+      const menuLinks = this.menuWrapper.querySelectorAll('a');
 
       if (!accordionContentEl) {
         console.error('Accordion content not found for the backdrop click');
         return;
       }
 
-      this.menuBackdrop?.addEventListener('click', () => {
-        if (this.menuWrapper?.hasAttribute('open')) {
-          const { height } = this.getMenuDimensions(accordionContentEl);
-
-          accordionContentEl.classList.add(this.ANIMATION_PROGRESS_CLASSNAME);
-
-          const animation = accordionContentEl.animate(
-            [{ height: `${height}px` }, { height: '0px' }],
-            {
-              duration: this.ANIMATION_DURATION_IN_MS,
-              fill: 'forwards',
-            }
-          );
-
-          animation.onfinish = () => {
-            this.menuWrapper?.removeAttribute('open');
-            accordionContentEl.style.height = '';
-            accordionContentEl.classList.remove(this.ANIMATION_PROGRESS_CLASSNAME);
-          };
-        }
+      // Event listener for backdrop click
+      this.menuBackdrop.addEventListener('click', () => {
+        this.closeMenuWithAnimation(accordionContentEl);
       });
+
+      // Event listener for menu link clicks
+      menuLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+          this.closeMenuWithAnimation(accordionContentEl);
+        });
+      });
+    }
+  }
+
+  private closeMenuWithAnimation(contentEl: HTMLElement) {
+    if (this.menuWrapper && this.menuWrapper.hasAttribute('open')) {
+      const { height } = this.getMenuDimensions(contentEl);
+
+      contentEl.classList.add(this.ANIMATION_PROGRESS_CLASSNAME);
+
+      const animation = contentEl.animate([{ height: `${height}px` }, { height: '0px' }], {
+        duration: this.ANIMATION_DURATION_IN_MS,
+        fill: 'forwards',
+      });
+
+      animation.onfinish = () => {
+        this.menuWrapper?.removeAttribute('open');
+        contentEl.style.height = '';
+        contentEl.classList.remove(this.ANIMATION_PROGRESS_CLASSNAME);
+      };
     }
   }
 }
