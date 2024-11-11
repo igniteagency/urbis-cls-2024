@@ -68,6 +68,7 @@ abstract class UrbisSurveyChart {
   CHART_DATA_WRAPPER_SELECTOR = '.chart_data';
   CHART_DATASET_WRAPPER_SELECTOR = '.chart_dataset-wrapper';
   CHART_DATA_TOGGLE_SELECTOR = '.chart_data-toggle';
+  CHART_SOURCE_TEXT_SELECTOR = '[data-el="chart-source-text"]';
 
   TOGGLE_ACTIVE_CLASSNAME = 'is-active';
 
@@ -78,6 +79,7 @@ abstract class UrbisSurveyChart {
   textLightColor: string;
 
   chartLabelsList: NodeListOf<HTMLElement>;
+  sourceTextElList: NodeListOf<HTMLElement>;
 
   activeToggle: number = 1;
 
@@ -104,6 +106,9 @@ abstract class UrbisSurveyChart {
     this.chartValues = this.extractDataAsNumber(
       chartWrapper.querySelector(this.CHART_VALUES_SELECTOR)
     );
+
+    this.sourceTextElList = chartWrapper.querySelectorAll(this.CHART_SOURCE_TEXT_SELECTOR);
+
     this.chartColor = chartWrapper.getAttribute('data-chart-color') || window.colors.chart2024Dark;
 
     this.textDarkColor = window.colors.darkTextStatic;
@@ -175,6 +180,7 @@ abstract class UrbisSurveyChart {
       (this.chartWrapper?.querySelector(
         `${this.CHART_DATA_TOGGLE_SELECTOR}:nth-of-type(1)`
       ) as HTMLElement) || null;
+    this.setCurrentToggleSourceText();
     this.setChartToggleActiveClass(initTargetEl);
   }
 
@@ -313,6 +319,8 @@ abstract class UrbisSurveyChart {
       this.chartInstance.config.options.plugins.title.text = chartTitle;
     }
 
+    this.setCurrentToggleSourceText();
+
     this.populateChartValuesList();
     this.chartInstance.config.data.datasets = this.generateDataset();
     this.chartInstance.config.data.labels = this.chartLabels;
@@ -358,6 +366,16 @@ abstract class UrbisSurveyChart {
     const lightenValue: number = (100 - this.barColorLightenMinPercent) / legends || 0;
 
     return 0 === num ? color : lighten(color, lightenValue * num);
+  }
+
+  protected setCurrentToggleSourceText() {
+    const currentToggleSourceTextEl = this.sourceTextElList[this.activeToggle - 1];
+    if (this.sourceTextElList.length > 1 && currentToggleSourceTextEl) {
+      this.sourceTextElList.forEach((el) => {
+        el.style.display = 'none';
+      });
+      currentToggleSourceTextEl.style.display = 'block';
+    }
   }
 }
 
