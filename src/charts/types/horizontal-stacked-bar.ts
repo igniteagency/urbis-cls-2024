@@ -16,7 +16,7 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
   constructor(chartWrapper: HTMLDivElement) {
     super(chartWrapper);
 
-    const legendsEl: HTMLElement | null = chartWrapper.querySelector(this.chartLegendsSelector);
+    const legendsEl: HTMLElement | null = chartWrapper.querySelector(this.CHART_LEGENDS_SELECTOR);
     this.legends = this.extractDataAsString(legendsEl);
 
     // Add default legend if none provided

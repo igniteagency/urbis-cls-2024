@@ -104,7 +104,7 @@ class HorizontalDeviationChart extends BarChart {
       {
         label: 'Value',
         data: this.extractDataAsNumber(
-          this.currentDataset?.querySelector(this.chartValuesSelector) || null
+          this.currentDataset?.querySelector(this.CHART_VALUES_SELECTOR) || null
         ),
         backgroundColor: (context: ScriptableContext<'bar'>) => {
           const index = context.dataIndex;

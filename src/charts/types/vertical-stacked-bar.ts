@@ -33,20 +33,20 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
   constructor(chartWrapper: HTMLDivElement) {
     super(chartWrapper);
 
-    const legendsEl: HTMLElement | null = chartWrapper.querySelector(this.chartLegendsSelector);
+    const legendsEl: HTMLElement | null = chartWrapper.querySelector(this.CHART_LEGENDS_SELECTOR);
     this.legends = this.extractDataAsString(legendsEl);
 
     this.chartTitle = this.getChartTitle();
 
     const chartLabelSmallEl: HTMLElement | null =
-      chartWrapper?.querySelector(`${this.chartLabelsSelector}[data-chart-label-type="small"]`) ||
-      chartWrapper?.querySelector(`${this.chartLabelsSelector}:not([data-chart-label-type]`) ||
+      chartWrapper?.querySelector(`${this.CHART_LABELS_SELECTOR}[data-chart-label-type="small"]`) ||
+      chartWrapper?.querySelector(`${this.CHART_LABELS_SELECTOR}:not([data-chart-label-type]`) ||
       null;
 
     this.chartLabelSmall = this.extractDataAsString(chartLabelSmallEl);
 
     const chartLabelLargeEl: HTMLElement | null =
-      chartWrapper?.querySelector(`${this.chartLabelsSelector}[data-chart-label-type="large"]`) || null;
+      chartWrapper?.querySelector(`${this.CHART_LABELS_SELECTOR}[data-chart-label-type="large"]`) || null;
 
     this.chartLabelLarge = this.extractDataAsString(chartLabelLargeEl);
 

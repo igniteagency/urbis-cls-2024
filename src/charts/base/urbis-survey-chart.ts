@@ -58,16 +58,16 @@ abstract class UrbisSurveyChart {
   maxLabelRotation = 90;
 
   // CSS selectors of all the important chart elements
-  chartValuesSelector = '.chart_values';
-  chartLabelsSelector = '.chart_labels';
-  chartLabelsInstanceSelector = '[data-chart-label-instance]';
-  chartLegendsSelector = '.chart_legends';
-  chartCanvasContainerSelector = '.chart_canvas-container';
-  chartCanvasSelector = '.chart_canvas';
-  chartTitleSelector = '.chart_title';
-  chartDataWrapperSelector = '.chart_data';
-  chartDatasetWrapperSelector = '.chart_dataset-wrapper';
-  chartDataToggleSelector = '.chart_data-toggle';
+  CHART_VALUES_SELECTOR = '.chart_values';
+  CHART_LABELS_SELECTOR = '.chart_labels';
+  CHART_LABELS_INSTANCE_SELECTOR = '[data-chart-label-instance]';
+  CHART_LEGENDS_SELECTOR = '.chart_legends';
+  CHART_CANVAS_CONTAINER_SELECTOR = '.chart_canvas-container';
+  CHART_CANVAS_SELECTOR = '.chart_canvas';
+  CHART_TITLE_SELECTOR = '.chart_title';
+  CHART_DATA_WRAPPER_SELECTOR = '.chart_data';
+  CHART_DATASET_WRAPPER_SELECTOR = '.chart_dataset-wrapper';
+  CHART_DATA_TOGGLE_SELECTOR = '.chart_data-toggle';
 
   TOGGLE_ACTIVE_CLASSNAME = 'is-active';
 
@@ -90,19 +90,19 @@ abstract class UrbisSurveyChart {
 
   constructor(chartWrapper: HTMLDivElement) {
     this.chartWrapper = chartWrapper;
-    this.chartCanvas = chartWrapper.querySelector(this.chartCanvasSelector);
+    this.chartCanvas = chartWrapper.querySelector(this.CHART_CANVAS_SELECTOR);
 
     this.chartLabelsList =
       chartWrapper.querySelectorAll(
-        `${this.chartLabelsSelector}[data-chart-label-primary="true"]`
-      ) || chartWrapper.querySelectorAll(this.chartLabelsSelector);
+        `${this.CHART_LABELS_SELECTOR}[data-chart-label-primary="true"]`
+      ) || chartWrapper.querySelectorAll(this.CHART_LABELS_SELECTOR);
 
-    this.currentDataset = chartWrapper.querySelector(this.chartDatasetWrapperSelector);
+    this.currentDataset = chartWrapper.querySelector(this.CHART_DATASET_WRAPPER_SELECTOR);
 
     this.chartLabels = this.extractDataAsString(this.chartLabelsList[0]);
 
     this.chartValues = this.extractDataAsNumber(
-      chartWrapper.querySelector(this.chartValuesSelector)
+      chartWrapper.querySelector(this.CHART_VALUES_SELECTOR)
     );
     this.chartColor = chartWrapper.getAttribute('data-chart-color') || window.colors.chart2024Dark;
 
@@ -110,7 +110,7 @@ abstract class UrbisSurveyChart {
     this.textLightColor = window.colors.lightTextStatic;
 
     this.hasChartDataToggle =
-      chartWrapper.querySelectorAll(this.chartDataToggleSelector).length > 0;
+      chartWrapper.querySelectorAll(this.CHART_DATA_TOGGLE_SELECTOR).length > 0;
 
     this.barColorLightenMinPercent =
       Number(this.chartWrapper?.getAttribute('data-bar-color-min-lighten')) || 30;
@@ -134,7 +134,7 @@ abstract class UrbisSurveyChart {
 
   protected setChartDataToggleListener() {
     this.chartWrapper
-      ?.querySelectorAll(this.chartDataToggleSelector)
+      ?.querySelectorAll(this.CHART_DATA_TOGGLE_SELECTOR)
       .forEach((toggleEl, toggleIndex) => {
         toggleEl.addEventListener('click', (ev) => {
           const toggleInstance: number = toggleIndex + 1;
@@ -144,12 +144,12 @@ abstract class UrbisSurveyChart {
 
           this.currentDataset =
             this.chartWrapper?.querySelector(
-              `${this.chartDataWrapperSelector} > ${this.chartDatasetWrapperSelector}:nth-of-type(${toggleInstance})`
+              `${this.CHART_DATA_WRAPPER_SELECTOR} > ${this.CHART_DATASET_WRAPPER_SELECTOR}:nth-of-type(${toggleInstance})`
             ) || null;
 
           if (!this.currentDataset) {
             console.error(
-              `No dataset found for ${this.chartDatasetWrapperSelector} ${toggleInstance} instance`,
+              `No dataset found for ${this.CHART_DATASET_WRAPPER_SELECTOR} ${toggleInstance} instance`,
               this.chartWrapper
             );
           }
@@ -173,7 +173,7 @@ abstract class UrbisSurveyChart {
     // Initial click
     const initTargetEl =
       (this.chartWrapper?.querySelector(
-        `${this.chartDataToggleSelector}:nth-of-type(1)`
+        `${this.CHART_DATA_TOGGLE_SELECTOR}:nth-of-type(1)`
       ) as HTMLElement) || null;
     this.setChartToggleActiveClass(initTargetEl);
   }
@@ -186,7 +186,7 @@ abstract class UrbisSurveyChart {
 
     // remove active class from the previous toggle
     this.chartWrapper
-      ?.querySelector(`${this.chartDataToggleSelector}.${this.TOGGLE_ACTIVE_CLASSNAME}`)
+      ?.querySelector(`${this.CHART_DATA_TOGGLE_SELECTOR}.${this.TOGGLE_ACTIVE_CLASSNAME}`)
       ?.classList.remove(this.TOGGLE_ACTIVE_CLASSNAME);
 
     targetEl?.classList.add(this.TOGGLE_ACTIVE_CLASSNAME); // add active class to the current toggle
@@ -274,7 +274,7 @@ abstract class UrbisSurveyChart {
     const bufferSpace = 30;
 
     const canvasContainerEl: HTMLElement | null | undefined = this.chartWrapper?.querySelector(
-      this.chartCanvasContainerSelector
+      this.CHART_CANVAS_CONTAINER_SELECTOR
     );
 
     if (!canvasContainerEl) {
@@ -287,7 +287,7 @@ abstract class UrbisSurveyChart {
   // Populates the chartValuesList for the current dataset
   protected populateChartValuesList(): void {
     const chartValuesElList: NodeListOf<HTMLElement> | undefined =
-      this.currentDataset?.querySelectorAll(this.chartValuesSelector);
+      this.currentDataset?.querySelectorAll(this.CHART_VALUES_SELECTOR);
 
     if (chartValuesElList?.length) {
       this.chartValuesList = [];
@@ -324,7 +324,7 @@ abstract class UrbisSurveyChart {
    */
   protected getChartTitle(): string {
     const titleEl = this.currentDataset?.querySelector(
-      this.chartTitleSelector
+      this.CHART_TITLE_SELECTOR
     ) as HTMLElement | null;
     return titleEl ? titleEl.innerText.trim() : '';
   }
