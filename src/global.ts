@@ -3,6 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SplitType from 'split-type';
 
 import ChartJSInit from '$charts/main';
+import { fadeUp } from '$utils/fade';
 import { getCSSVar } from '$utils/getCSSVar';
 
 import { headingReveal } from './components/heading-reveal';
@@ -37,4 +38,6 @@ window.Webflow?.push(() => {
 
   headingReveal();
   revealImages();
+
+  fadeUp();
 });

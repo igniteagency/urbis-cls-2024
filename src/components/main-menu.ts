@@ -8,17 +8,23 @@ class MainMenu {
   ANIMATION_PROGRESS_CLASSNAME = 'is-animating';
 
   accordionEl: HTMLDetailsElement;
+  menuWrapper: HTMLDetailsElement | null;
+  menuBackdrop: HTMLElement | null;
 
   constructor() {
     this.accordionEl = document.querySelector<HTMLDetailsElement>(
       this.ITEM_SELECTOR
     ) as HTMLDetailsElement;
 
+    this.menuWrapper = document.querySelector('.menu_wrapper') as HTMLDetailsElement | null;
+    this.menuBackdrop = document.querySelector('.menu_backdrop') as HTMLElement | null;
+
     if (!this.accordionEl) {
       return;
     }
 
     this.animateMenu();
+    this.addBackdropClickListener();
   }
 
   private animateMenu() {
@@ -95,6 +101,50 @@ class MainMenu {
       width: contentEl.scrollWidth,
       height: contentEl.scrollHeight + 5,
     };
+  }
+
+  private addBackdropClickListener() {
+    if (this.menuWrapper && this.menuBackdrop) {
+      const accordionContentEl = this.menuWrapper.querySelector(this.CONTENT_SELECTOR);
+      const menuLinks = this.menuWrapper.querySelectorAll('a');
+
+      if (!accordionContentEl) {
+        console.error('Accordion content not found for the backdrop click');
+        return;
+      }
+
+      // Event listener for backdrop click
+      this.menuBackdrop.addEventListener('click', () => {
+        this.closeMenuWithAnimation(accordionContentEl);
+      });
+
+      // Event listener for menu link clicks
+      menuLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+          this.closeMenuWithAnimation(accordionContentEl);
+        });
+      });
+    }
+  }
+
+  private closeMenuWithAnimation(contentEl: HTMLElement) {
+    // todo consolidate this into a close event listener instead of duplicating code
+    if (this.menuWrapper && this.menuWrapper.hasAttribute('open')) {
+      const { height } = this.getMenuDimensions(contentEl);
+
+      contentEl.classList.add(this.ANIMATION_PROGRESS_CLASSNAME);
+
+      const animation = contentEl.animate([{ height: `${height}px` }, { height: '0px' }], {
+        duration: this.ANIMATION_DURATION_IN_MS,
+        fill: 'forwards',
+      });
+
+      animation.onfinish = () => {
+        this.menuWrapper?.removeAttribute('open');
+        contentEl.style.height = '';
+        contentEl.classList.remove(this.ANIMATION_PROGRESS_CLASSNAME);
+      };
+    }
   }
 }
 

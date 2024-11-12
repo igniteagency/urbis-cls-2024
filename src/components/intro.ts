@@ -22,7 +22,7 @@ export function IntroAnimation() {
     });
 
     splitText.lines.forEach((line) => {
-      const wrapper = document.createElement('div');
+      const wrapper = document.createElement('span');
       wrapper.style.overflow = 'hidden';
       wrapper.style.display = 'inline-block'; // Keeps lines in place horizontally
 
@@ -118,6 +118,14 @@ export function IntroAnimation() {
     '>'
   );
 
+  introTl.to(
+    '.menu_wrapper',
+    {
+      y: 0,
+    },
+    '<+=0.2'
+  );
+
   // introTl.to(
   //   '.hero-header_background-video-wrapper',
   //   {
@@ -184,19 +192,19 @@ export function IntroAnimation() {
 
   // Add the next animation after messages sequence
   introTl.to(
-    '.intro_logo',
+    '.intro_logo.cls',
     {
-      yPercent: 122,
+      yPercent: 100,
     },
     '-=1'
   );
 
   introTl.to(
-    '.menu_wrapper',
+    '.intro_logo.urbis',
     {
-      y: 0,
+      bottom: 0,
     },
-    '<+=0.2'
+    '<'
   );
 
   introTl.to(

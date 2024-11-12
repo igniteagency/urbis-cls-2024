@@ -91,6 +91,8 @@ class ChartJSInit {
     // Gap between tooltip color box and label text
     Chart.defaults.plugins.tooltip.boxPadding = 4;
 
+    Chart.defaults.maintainAspectRatio = false;
+
     // Legends
     Chart.defaults.plugins.legend.labels.boxWidth = 12;
     Chart.defaults.plugins.legend.labels.boxHeight = 12;

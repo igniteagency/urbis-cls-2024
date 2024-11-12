@@ -1,5 +1,5 @@
 import type Chart from 'chart.js/auto';
-import type { CoreScaleOptions, Scale } from 'chart.js/auto';
+import type { ChartDataset, CoreScaleOptions, Scale } from 'chart.js/auto';
 import type { _DeepPartialObject } from 'chart.js/dist/types/utils';
 import type { LabelOptions } from 'chartjs-plugin-datalabels/types/options';
 
@@ -17,6 +17,11 @@ abstract class UrbisSurveyChart {
   chartInstance: Chart | null = null;
   hasChartDataToggle = false;
   currentDataset: HTMLElement | null;
+
+  /**
+   * A list of chart values for each stack segment
+   */
+  chartValuesList: Array<Array<number>> = [];
 
   /**
    * Default position of the legends for this chart.
@@ -53,16 +58,17 @@ abstract class UrbisSurveyChart {
   maxLabelRotation = 90;
 
   // CSS selectors of all the important chart elements
-  chartValuesSelector = '.chart_values';
-  chartLabelsSelector = '.chart_labels';
-  chartLabelsInstanceSelector = '[data-chart-label-instance]';
-  chartLegendsSelector = '.chart_legends';
-  chartCanvasContainerSelector = '.chart_canvas-container';
-  chartCanvasSelector = '.chart_canvas';
-  chartTitleSelector = '.chart_title';
-  chartDataWrapperSelector = '.chart_data';
-  chartDatasetWrapperSelector = '.chart_dataset-wrapper';
-  chartDataToggleSelector = '.chart_data-toggle';
+  CHART_VALUES_SELECTOR = '.chart_values';
+  CHART_LABELS_SELECTOR = '.chart_labels';
+  CHART_LABELS_INSTANCE_SELECTOR = '[data-chart-label-instance]';
+  CHART_LEGENDS_SELECTOR = '.chart_legends';
+  CHART_CANVAS_CONTAINER_SELECTOR = '.chart_canvas-container';
+  CHART_CANVAS_SELECTOR = '.chart_canvas';
+  CHART_TITLE_SELECTOR = '.chart_title';
+  CHART_DATA_WRAPPER_SELECTOR = '.chart_data';
+  CHART_DATASET_WRAPPER_SELECTOR = '.chart_dataset-wrapper';
+  CHART_DATA_TOGGLE_SELECTOR = '.chart_data-toggle';
+  CHART_SOURCE_TEXT_SELECTOR = '[data-el="chart-source-text"]';
 
   TOGGLE_ACTIVE_CLASSNAME = 'is-active';
 
@@ -73,6 +79,7 @@ abstract class UrbisSurveyChart {
   textLightColor: string;
 
   chartLabelsList: NodeListOf<HTMLElement>;
+  sourceTextElList: NodeListOf<HTMLElement>;
 
   activeToggle: number = 1;
 
@@ -81,35 +88,34 @@ abstract class UrbisSurveyChart {
    */
   horizontalChartWidthQuotient = 2.5;
 
-  /**
-   * triggers on chart toggle switch
-   * @param toggleInstance starting from 1
-   */
-  protected abstract toggleChartData(): void;
+  protected abstract generateDataset(): Array<ChartDataset>;
 
   constructor(chartWrapper: HTMLDivElement) {
     this.chartWrapper = chartWrapper;
-    this.chartCanvas = chartWrapper.querySelector(this.chartCanvasSelector);
+    this.chartCanvas = chartWrapper.querySelector(this.CHART_CANVAS_SELECTOR);
 
     this.chartLabelsList =
       chartWrapper.querySelectorAll(
-        `${this.chartLabelsSelector}[data-chart-label-primary="true"]`
-      ) || chartWrapper.querySelectorAll(this.chartLabelsSelector);
+        `${this.CHART_LABELS_SELECTOR}[data-chart-label-primary="true"]`
+      ) || chartWrapper.querySelectorAll(this.CHART_LABELS_SELECTOR);
 
-    this.currentDataset = chartWrapper.querySelector(this.chartDatasetWrapperSelector);
+    this.currentDataset = chartWrapper.querySelector(this.CHART_DATASET_WRAPPER_SELECTOR);
 
     this.chartLabels = this.extractDataAsString(this.chartLabelsList[0]);
 
     this.chartValues = this.extractDataAsNumber(
-      chartWrapper.querySelector(this.chartValuesSelector)
+      chartWrapper.querySelector(this.CHART_VALUES_SELECTOR)
     );
+
+    this.sourceTextElList = chartWrapper.querySelectorAll(this.CHART_SOURCE_TEXT_SELECTOR);
+
     this.chartColor = chartWrapper.getAttribute('data-chart-color') || window.colors.chart2024Dark;
 
     this.textDarkColor = window.colors.darkTextStatic;
     this.textLightColor = window.colors.lightTextStatic;
 
     this.hasChartDataToggle =
-      chartWrapper.querySelectorAll(this.chartDataToggleSelector).length > 0;
+      chartWrapper.querySelectorAll(this.CHART_DATA_TOGGLE_SELECTOR).length > 0;
 
     this.barColorLightenMinPercent =
       Number(this.chartWrapper?.getAttribute('data-bar-color-min-lighten')) || 30;
@@ -133,7 +139,7 @@ abstract class UrbisSurveyChart {
 
   protected setChartDataToggleListener() {
     this.chartWrapper
-      ?.querySelectorAll(this.chartDataToggleSelector)
+      ?.querySelectorAll(this.CHART_DATA_TOGGLE_SELECTOR)
       .forEach((toggleEl, toggleIndex) => {
         toggleEl.addEventListener('click', (ev) => {
           const toggleInstance: number = toggleIndex + 1;
@@ -143,12 +149,12 @@ abstract class UrbisSurveyChart {
 
           this.currentDataset =
             this.chartWrapper?.querySelector(
-              `${this.chartDataWrapperSelector} > ${this.chartDatasetWrapperSelector}:nth-of-type(${toggleInstance})`
+              `${this.CHART_DATA_WRAPPER_SELECTOR} > ${this.CHART_DATASET_WRAPPER_SELECTOR}:nth-of-type(${toggleInstance})`
             ) || null;
 
           if (!this.currentDataset) {
             console.error(
-              `No dataset found for ${this.chartDatasetWrapperSelector} ${toggleInstance} instance`,
+              `No dataset found for ${this.CHART_DATASET_WRAPPER_SELECTOR} ${toggleInstance} instance`,
               this.chartWrapper
             );
           }
@@ -172,8 +178,9 @@ abstract class UrbisSurveyChart {
     // Initial click
     const initTargetEl =
       (this.chartWrapper?.querySelector(
-        `${this.chartDataToggleSelector}:nth-of-type(1)`
+        `${this.CHART_DATA_TOGGLE_SELECTOR}:nth-of-type(1)`
       ) as HTMLElement) || null;
+    this.setCurrentToggleSourceText();
     this.setChartToggleActiveClass(initTargetEl);
   }
 
@@ -185,7 +192,7 @@ abstract class UrbisSurveyChart {
 
     // remove active class from the previous toggle
     this.chartWrapper
-      ?.querySelector(`${this.chartDataToggleSelector}.${this.TOGGLE_ACTIVE_CLASSNAME}`)
+      ?.querySelector(`${this.CHART_DATA_TOGGLE_SELECTOR}.${this.TOGGLE_ACTIVE_CLASSNAME}`)
       ?.classList.remove(this.TOGGLE_ACTIVE_CLASSNAME);
 
     targetEl?.classList.add(this.TOGGLE_ACTIVE_CLASSNAME); // add active class to the current toggle
@@ -273,7 +280,7 @@ abstract class UrbisSurveyChart {
     const bufferSpace = 30;
 
     const canvasContainerEl: HTMLElement | null | undefined = this.chartWrapper?.querySelector(
-      this.chartCanvasContainerSelector
+      this.CHART_CANVAS_CONTAINER_SELECTOR
     );
 
     if (!canvasContainerEl) {
@@ -281,6 +288,53 @@ abstract class UrbisSurveyChart {
     }
 
     canvasContainerEl.style.minHeight = `${this.chartLabels.length * (this.maxBarThickness + bufferSpace)}px`;
+  }
+
+  // Populates the chartValuesList for the current dataset
+  protected populateChartValuesList(): void {
+    const chartValuesElList: NodeListOf<HTMLElement> | undefined =
+      this.currentDataset?.querySelectorAll(this.CHART_VALUES_SELECTOR);
+
+    if (chartValuesElList?.length) {
+      this.chartValuesList = [];
+      for (const legendValuesEl of chartValuesElList) {
+        this.chartValuesList.push(this.extractDataAsNumber(legendValuesEl));
+      }
+    }
+  }
+
+  /**
+   * triggers on chart toggle switch
+   * @param toggleInstance starting from 1
+   */
+  protected toggleChartData() {
+    if (!this.chartInstance) {
+      console.error('No chartInstance found', this.chartInstance, this.chartWrapper);
+      return;
+    }
+
+    const chartTitle = this.getChartTitle();
+
+    if (this.chartInstance.config.options?.plugins?.title?.text) {
+      this.chartInstance.config.options.plugins.title.text = chartTitle;
+    }
+
+    this.setCurrentToggleSourceText();
+
+    this.populateChartValuesList();
+    this.chartInstance.config.data.datasets = this.generateDataset();
+    this.chartInstance.config.data.labels = this.chartLabels;
+    this.chartInstance.update();
+  }
+
+  /**
+   * @returns The title of chart from the HTML
+   */
+  protected getChartTitle(): string {
+    const titleEl = this.currentDataset?.querySelector(
+      this.CHART_TITLE_SELECTOR
+    ) as HTMLElement | null;
+    return titleEl ? titleEl.innerText.trim() : '';
   }
 
   /**
@@ -312,6 +366,16 @@ abstract class UrbisSurveyChart {
     const lightenValue: number = (100 - this.barColorLightenMinPercent) / legends || 0;
 
     return 0 === num ? color : lighten(color, lightenValue * num);
+  }
+
+  protected setCurrentToggleSourceText() {
+    const currentToggleSourceTextEl = this.sourceTextElList[this.activeToggle - 1];
+    if (this.sourceTextElList.length > 1 && currentToggleSourceTextEl) {
+      this.sourceTextElList.forEach((el) => {
+        el.style.display = 'none';
+      });
+      currentToggleSourceTextEl.style.display = 'block';
+    }
   }
 }
 

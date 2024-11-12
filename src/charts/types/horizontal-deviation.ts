@@ -49,10 +49,16 @@ class HorizontalDeviationChart extends BarChart {
               // drawBorder: false,
               drawTicks: true,
             },
+            border: {
+              display: false,
+            },
           },
           y: {
             stacked: this.isStacked,
             grid: {
+              display: false,
+            },
+            border: {
               display: false,
             },
             ticks: {
@@ -104,7 +110,7 @@ class HorizontalDeviationChart extends BarChart {
       {
         label: 'Value',
         data: this.extractDataAsNumber(
-          this.currentDataset?.querySelector(this.chartValuesSelector) || null
+          this.currentDataset?.querySelector(this.CHART_VALUES_SELECTOR) || null
         ),
         backgroundColor: (context: ScriptableContext<'bar'>) => {
           const index = context.dataIndex;

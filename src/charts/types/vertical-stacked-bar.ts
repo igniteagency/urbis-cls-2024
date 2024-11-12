@@ -26,11 +26,6 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
   chartLabelLarge: Array<string>;
 
   /**
-   * Array of Chart value HTML elements for each bar/legend
-   */
-  chartValuesList: Array<Array<number>> = [];
-
-  /**
    * Index of the middle legend value (lying on the center of x-axis)
    */
   midLegendIndex: number;
@@ -38,20 +33,20 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
   constructor(chartWrapper: HTMLDivElement) {
     super(chartWrapper);
 
-    const legendsEl: HTMLElement | null = chartWrapper.querySelector(this.chartLegendsSelector);
+    const legendsEl: HTMLElement | null = chartWrapper.querySelector(this.CHART_LEGENDS_SELECTOR);
     this.legends = this.extractDataAsString(legendsEl);
 
     this.chartTitle = this.getChartTitle();
 
     const chartLabelSmallEl: HTMLElement | null =
-      chartWrapper?.querySelector(`${this.chartLabelsSelector}[data-chart-label-type="small"]`) ||
-      chartWrapper?.querySelector(`${this.chartLabelsSelector}:not([data-chart-label-type]`) ||
+      chartWrapper?.querySelector(`${this.CHART_LABELS_SELECTOR}[data-chart-label-type="small"]`) ||
+      chartWrapper?.querySelector(`${this.CHART_LABELS_SELECTOR}:not([data-chart-label-type]`) ||
       null;
 
     this.chartLabelSmall = this.extractDataAsString(chartLabelSmallEl);
 
     const chartLabelLargeEl: HTMLElement | null =
-      chartWrapper?.querySelector(`${this.chartLabelsSelector}[data-chart-label-type="large"]`) || null;
+      chartWrapper?.querySelector(`${this.CHART_LABELS_SELECTOR}[data-chart-label-type="large"]`) || null;
 
     this.chartLabelLarge = this.extractDataAsString(chartLabelLargeEl);
 
@@ -101,7 +96,9 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
             },
             grid: {
               display: false,
-              drawBorder: false,
+            },
+            border: {
+              display: false,
             },
           },
           xAxisSmallLabel: this.getXAxisSmallLabels(),
@@ -122,7 +119,9 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
             },
             grid: {
               display: false,
-              // drawBorder: false, // no vertical border of the axis
+            },
+            border: {
+              display: false,
             },
           },
         },
@@ -167,25 +166,11 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
     return this.chartInstance;
   }
 
-  // Populates the chartValuesList for the current dataset
-  protected populateChartValuesList(): void {
-    const chartValuesElList: NodeListOf<HTMLElement> | undefined = this.currentDataset?.querySelectorAll(
-      this.chartValuesSelector
-    );
-
-    if (chartValuesElList?.length) {
-      this.chartValuesList = [];
-      for (const legendValuesEl of chartValuesElList) {
-        this.chartValuesList.push(this.extractDataAsNumber(legendValuesEl));
-      }
-    }
-  }
-
   /**
    * Generates and passes the dataset for the chart
    * @returns The dataset value for the chart
    */
-  private generateDataset(): Array<ChartDataset> {
+  protected generateDataset(): Array<ChartDataset> {
     const dataset: Array<ChartDataset> = [];
 
     for (let i = this.legends.length - 1; i >= 0; i--) {
@@ -201,24 +186,6 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
     }
 
     return dataset;
-  }
-
-  protected toggleChartData(): void {
-    if (!this.chartInstance) {
-      console.error('No chartInstance found', this.chartInstance, this.chartWrapper);
-      return;
-    }
-
-    const chartTitle = this.getChartTitle();
-
-    if (this.chartInstance.config.options?.plugins?.title?.text) {
-      this.chartInstance.config.options.plugins.title.text = chartTitle;
-    }
-
-    this.populateChartValuesList();
-    this.chartInstance.config.data.datasets = this.generateDataset();
-    this.chartInstance.config.data.labels = this.chartLabels;
-    this.chartInstance.update();
   }
 
   /**
@@ -315,13 +282,7 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
     };
   }
 
-  /**
-   * @returns The title of chart from the HTML
-   */
-  private getChartTitle(): string {
-    const titleEl = this.currentDataset?.querySelector(this.chartTitleSelector) as HTMLElement | null;
-    return titleEl ? titleEl.innerText.trim() : '';
-  }
+  
 }
 
 export default VerticalStackedBarChart;
