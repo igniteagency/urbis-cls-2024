@@ -80,7 +80,8 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
         datasets: this.generateDataset(),
       },
       options: {
-        // maintainAspectRatio: false,
+        responsive: true,
+        maintainAspectRatio: false,
         datasets: {
           bar: {
             maxBarThickness: this.maxBarThickness,
