@@ -128,6 +128,7 @@ class MainMenu {
   }
 
   private closeMenuWithAnimation(contentEl: HTMLElement) {
+    // todo consolidate this into a close event listener instead of duplicating code
     if (this.menuWrapper && this.menuWrapper.hasAttribute('open')) {
       const { height } = this.getMenuDimensions(contentEl);
 
