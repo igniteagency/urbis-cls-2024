@@ -28,8 +28,6 @@ window.colors = {
 };
 
 window.Webflow?.push(() => {
-  new VimeoVideoControls();
-
   new TableChart();
   new ChartJSInit();
 
@@ -40,4 +38,8 @@ window.Webflow?.push(() => {
   revealImages();
 
   fadeUp();
+
+  setTimeout(() => {
+    new VimeoVideoControls();
+  }, 150);
 });
