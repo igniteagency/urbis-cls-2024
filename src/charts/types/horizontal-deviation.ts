@@ -63,13 +63,13 @@ class HorizontalDeviationChart extends BarChart {
             },
             ticks: {
               callback: function (val) {
-                return deviationBarChartClass.getYTicks(val, this);
+                return deviationBarChartClass.getYAxisLabelWidth(val, this);
               },
               crossAlign: 'far',
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / this.horizontalChartWidthQuotient;
+              scale.width = scale.chart.width * this.getResponsiveScaleWidth();
             },
           },
         },

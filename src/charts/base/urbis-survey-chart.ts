@@ -83,11 +83,6 @@ abstract class UrbisSurveyChart {
 
   activeToggle: number = 1;
 
-  /**
-   * 25% of chart's width
-   */
-  horizontalChartWidthQuotient = 2.5;
-
   protected abstract generateDataset(): Array<ChartDataset>;
 
   constructor(chartWrapper: HTMLDivElement) {
@@ -135,6 +130,8 @@ abstract class UrbisSurveyChart {
 
     // init color theme trigger
     this.onThemeChange(window.currentTheme);
+
+    this.setupResizeHandler();
   }
 
   protected setChartDataToggleListener() {
@@ -376,6 +373,52 @@ abstract class UrbisSurveyChart {
       });
       currentToggleSourceTextEl.style.display = 'block';
     }
+  }
+
+  protected getResponsiveScaleWidth() {
+    const width = window.innerWidth;
+    if (width <= 480) return 0.25; // Mobile
+    if (width <= 768) return 0.3; // Tablet
+    return 0.4; // Desktop
+  }
+
+  private setupResizeHandler() {
+    let resizeTimer: number;
+    window.addEventListener('resize', () => {
+      // Debounce resize events
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        this.chartInstance?.resize();
+      }, 250);
+    });
+  }
+
+  protected getYAxisLabelWidth(value: string | number, scale: Scale<CoreScaleOptions>) {
+    const chartWidth: number = scale.chart.width;
+    const label = scale.getLabelForValue(Number(value));
+
+    if (!chartWidth) return label;
+
+    const baseCharWidth = 7; // Approximate width of a character in pixels
+    const maxLineLength = Math.floor((chartWidth * this.getResponsiveScaleWidth()) / baseCharWidth);
+
+    // Split words and recombine them into lines that fit within maxLineLength
+    const words = label.split(' ');
+    const lines = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i];
+      if ((currentLine + ' ' + word).length <= maxLineLength) {
+        currentLine += ' ' + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    lines.push(currentLine);
+
+    return lines;
   }
 }
 

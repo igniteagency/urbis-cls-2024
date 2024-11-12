@@ -91,7 +91,7 @@ class ChartJSInit {
     // Gap between tooltip color box and label text
     Chart.defaults.plugins.tooltip.boxPadding = 4;
 
-    Chart.defaults.maintainAspectRatio = false;
+    Chart.defaults.responsive = true;
 
     // Legends
     Chart.defaults.plugins.legend.labels.boxWidth = 12;
@@ -132,9 +132,7 @@ class ChartJSInit {
   }
 
   private setDefaultFontSize() {
-    if (479 > window.innerWidth) {
-      Chart.defaults.font.size = 10;
-    } else if (768 > window.innerWidth) {
+    if (768 > window.innerWidth) {
       Chart.defaults.font.size = 12;
     } else if (991 > window.innerWidth) {
       Chart.defaults.font.size = 14;
