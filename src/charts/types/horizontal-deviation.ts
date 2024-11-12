@@ -49,10 +49,16 @@ class HorizontalDeviationChart extends BarChart {
               // drawBorder: false,
               drawTicks: true,
             },
+            border: {
+              display: false,
+            },
           },
           y: {
             stacked: this.isStacked,
             grid: {
+              display: false,
+            },
+            border: {
               display: false,
             },
             ticks: {

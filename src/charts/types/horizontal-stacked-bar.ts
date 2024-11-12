@@ -59,12 +59,18 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
             grid: {
               display: false,
             },
+            border: {
+              display: false,
+            },
             min: 0,
             max: 100,
           },
           y: {
             stacked: true,
             grid: {
+              display: false,
+            },
+            border: {
               display: false,
             },
             ticks: {

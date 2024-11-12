@@ -96,7 +96,9 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
             },
             grid: {
               display: false,
-              drawBorder: false,
+            },
+            border: {
+              display: false,
             },
           },
           xAxisSmallLabel: this.getXAxisSmallLabels(),
@@ -117,7 +119,9 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
             },
             grid: {
               display: false,
-              // drawBorder: false, // no vertical border of the axis
+            },
+            border: {
+              display: false,
             },
           },
         },

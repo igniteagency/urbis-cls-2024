@@ -81,8 +81,10 @@ class BarChart extends UrbisSurveyChart {
             },
             grid: {
               display: false,
-              // drawBorder: false,
               drawTicks: true,
+            },
+            border: {
+              display: false,
             },
             min: 0,
             max: 100,
@@ -90,6 +92,9 @@ class BarChart extends UrbisSurveyChart {
           y: {
             stacked: this.isStacked,
             grid: {
+              display: false,
+            },
+            border: {
               display: false,
             },
             ticks: {
