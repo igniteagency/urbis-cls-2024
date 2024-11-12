@@ -13,6 +13,7 @@ export function headingReveal() {
       const wrapper = document.createElement('span');
       wrapper.style.overflow = 'hidden';
       wrapper.style.display = 'inline-block'; // Keeps lines aligned horizontally
+      wrapper.style.marginRight = '0.15em';
 
       line.parentNode.insertBefore(wrapper, line);
       wrapper.appendChild(line);
