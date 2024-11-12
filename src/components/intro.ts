@@ -22,7 +22,7 @@ export function IntroAnimation() {
     });
 
     splitText.lines.forEach((line) => {
-      const wrapper = document.createElement('div');
+      const wrapper = document.createElement('span');
       wrapper.style.overflow = 'hidden';
       wrapper.style.display = 'inline-block'; // Keeps lines in place horizontally
 

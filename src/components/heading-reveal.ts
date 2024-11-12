@@ -10,7 +10,7 @@ export function headingReveal() {
 
     // Wrap each line in a parent div for masking effect
     splitText.lines.forEach((line) => {
-      const wrapper = document.createElement('div');
+      const wrapper = document.createElement('span');
       wrapper.style.overflow = 'hidden';
       wrapper.style.display = 'inline-block'; // Keeps lines aligned horizontally
 
