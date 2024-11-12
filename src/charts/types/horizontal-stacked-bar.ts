@@ -74,14 +74,14 @@ class HorizontalStackedBarChart extends UrbisSurveyChart {
               display: false,
             },
             ticks: {
-              callback: function (val) {
-                return stackedBarChartClass.getYTicks(val, this);
+              callback: function (val, index) {
+                return stackedBarChartClass.getYAxisLabelWidth(val, this);
               },
               crossAlign: 'far',
               autoSkip: false,
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / this.horizontalChartWidthQuotient;
+              scale.width = scale.chart.width * this.getResponsiveScaleWidth();
             },
           },
         },

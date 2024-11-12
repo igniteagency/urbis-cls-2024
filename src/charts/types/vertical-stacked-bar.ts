@@ -80,7 +80,7 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
         datasets: this.generateDataset(),
       },
       options: {
-        maintainAspectRatio: false,
+        // maintainAspectRatio: false,
         datasets: {
           bar: {
             maxBarThickness: this.maxBarThickness,
@@ -132,6 +132,7 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
             align:
               <legendAlignment>this.chartWrapper?.getAttribute('data-legends-align') || this.defaultLegendAlignment,
             reverse: true, // show the legends in reverse order of the datasets
+            
           },
           title: {
             text: this.chartTitle,
@@ -221,6 +222,9 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
         display: false,
         drawBorder: false,
       },
+      border: {
+        display: false,
+      },
       ticks: {
         maxRotation: this.maxLabelRotation,
         callback: (value: string | number, index: number) => this.chartLabels[index],
@@ -246,6 +250,9 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
         display: false,
         drawBorder: false,
       },
+      border: {
+        display: false,
+      },
       ticks: {
         maxRotation: this.maxLabelRotation,
         font: {
@@ -266,6 +273,9 @@ class VerticalStackedBarChart extends UrbisSurveyChart {
       grid: {
         display: false,
         drawBorder: false,
+      },
+      border: {
+        display: false,
       },
       ticks: {
         font: {

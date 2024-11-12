@@ -64,7 +64,15 @@ class BarChart extends UrbisSurveyChart {
         datasets: {
           bar: {
             maxBarThickness: this.maxBarThickness,
+            barPercentage: 0.95, // Reduce gap between bars
+            categoryPercentage: 0.95 // Reduce category spacing
           },
+        },
+        layout: {
+          padding: {
+            left: 0,  // Minimize left padding
+            right: 8  // Small right padding for percentage values
+          }
         },
         scales: {
           x: {
@@ -98,15 +106,20 @@ class BarChart extends UrbisSurveyChart {
               display: false,
             },
             ticks: {
+              padding: 4,
               // using traditional function call instead of arrow function to preserve `this` context and pass it on
               callback: function (val) {
-                return barChartClass.getYTicks(val, this);
+                return barChartClass.getYAxisLabelWidth(val, this);
               },
               crossAlign: 'far',
               autoSkip: false,
+              maxRotation: 0, // Prevent label rotation
+              z: 1 // Ensure labels are drawn above grid lines
             },
             afterFit: (scale) => {
-              scale.width = scale.chart.width / this.horizontalChartWidthQuotient;
+              scale.width = scale.chart.width * this.getResponsiveScaleWidth();
+              // Add a small offset to bring bars closer to labels
+              scale.left = scale.left - 8;
             },
           },
         },
