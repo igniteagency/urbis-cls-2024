@@ -354,8 +354,7 @@ abstract class UrbisSurveyChart {
 
   protected getResponsiveScaleWidth() {
     const width = window.innerWidth;
-    if (width <= 480) return 0.25; // Mobile
-    if (width <= 768) return 0.3; // Tablet
+    if (width <= 480) return 0.35; // Mobile
     return 0.4; // Desktop
   }
 
@@ -376,7 +375,7 @@ abstract class UrbisSurveyChart {
 
     if (!chartWidth) return label;
 
-    const baseCharWidth = 7; // Approximate width of a character in pixels
+    const baseCharWidth = window.innerWidth > 991 ? 7 : 6; // Approximate width of a character in pixels
     const maxLineLength = Math.floor((chartWidth * this.getResponsiveScaleWidth()) / baseCharWidth);
 
     // Split words and recombine them into lines that fit within maxLineLength
